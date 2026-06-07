@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rexo Software Products | Investor Revenue Dashboard</title>
+  <style>
+    :root {
+      --navy: #1A2942;
+      --navy-2: #223754;
+      --gold: #C0A062;
+      --gold-2: #E3C77E;
+      --bg: #F4F6FA;
+      --card: #FFFFFF;
+      --text: #172033;
+      --muted: #6B7280;
+      --line: #E5E7EB;
+      --green: #157347;
+      --red: #B42318;
+      --blue: #2563EB;
+      --amber: #B7791F;
+      --shadow: 0 16px 40px rgba(26, 41, 66, 0.10);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top left, rgba(192,160,98,.16), transparent 32%), linear-gradient(180deg, #EEF2F8 0%, #F8FAFC 52%, #F4F6FA 100%);
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #0F1B2D 72%);
+      color: #fff;
+      padding: 30px 36px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -180px;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: rgba(192, 160, 98, .15);
+      border: 1px solid rgba(192, 160, 98, .25);
+    }
+
+    .hero-top {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      color: #fff;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--gold), #F2D88C);
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 22px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    }
+
+    h1 {
+      margin: 18px 0 8px;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.06;
+      letter-spacing: -1.1px;
+      max-width: 900px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      max-width: 880px;
+      font-size: 15.5px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button, .btn {
+      border: 0;
+      outline: 0;
+      border-radius: 12px;
+      padding: 11px 15px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: .2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--gold), #E3C77E);
+      color: var(--navy);
+      box-shadow: 0 10px 24px rgba(192,160,98,.22);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.02); }
+    button:active { transform: translateY(0); }
+
+    .container {
+      width: min(1480px, calc(100% - 36px));
+      margin: -34px auto 44px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      padding: 12px 16px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(229,231,235,.88);
+      color: var(--navy);
+      border-radius: 14px;
+      font-weight: 800;
+      box-shadow: 0 6px 20px rgba(26,41,66,.06);
+    }
+    .tab.active { background: var(--gold); color: var(--navy); border-color: transparent; }
+
+    .grid { display: grid; gap: 18px; }
+    .grid.kpi { grid-template-columns: repeat(5, minmax(160px, 1fr)); }
+    .grid.two { grid-template-columns: 1.2fr .8fr; }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.cards { grid-template-columns: repeat(3, minmax(240px, 1fr)); }
+
+    .card {
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(229,231,235,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .kpi-card {
+      padding: 17px 18px;
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 850;
+    }
+    .kpi-value {
+      font-size: clamp(22px, 2.1vw, 34px);
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1px;
+      margin-top: 10px;
+    }
+    .kpi-note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+
+    .section-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .section-title h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 21px;
+      letter-spacing: -.3px;
+    }
+    .section-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      background: #EEF2F8;
+      color: var(--navy);
+      border: 1px solid #E2E8F0;
+      padding: 9px 11px;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+
+    .danger-btn { background: #FFF1F0; color: var(--red); border-color: #FFD5D1; }
+    .success-btn { background: #EAF8F0; color: var(--green); border-color: #CDEDD9; }
+
+    .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 1060px; background: #fff; }
+    th, td { padding: 12px 12px; border-bottom: 1px solid var(--line); text-align: right; font-size: 13px; vertical-align: middle; }
+    th { background: #F8FAFC; color: var(--navy); text-transform: uppercase; letter-spacing: .06em; font-size: 11px; font-weight: 900; position: sticky; top: 0; z-index: 1; }
+    td:first-child, th:first-child { text-align: left; position: sticky; left: 0; background: inherit; z-index: 2; min-width: 180px; }
+    tr:hover td { background: #FCFBF7; }
+    tr.total-row td { font-weight: 900; background: #F3F0E8; color: var(--navy); }
+
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      border: 1px solid #D8DEE9;
+      border-radius: 10px;
+      padding: 9px 9px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+      outline-color: rgba(192,160,98,.4);
+    }
+    table input[type="number"] { min-width: 92px; text-align: right; padding: 7px; }
+    .small-input { max-width: 116px; }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+    .slider-row:last-child { border-bottom: 0; }
+    .slider-label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .slider-label strong { color: var(--navy); font-size: 13px; }
+    .slider-label span { color: var(--muted); font-size: 12px; }
+    input[type="range"] { width: 100%; accent-color: var(--gold); }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 850;
+      background: #EEF2F8;
+      color: var(--navy);
+    }
+    .pill.green { background: #EAF8F0; color: var(--green); }
+    .pill.red { background: #FFF1F0; color: var(--red); }
+    .pill.gold { background: #FFF7E2; color: #7C5B10; }
+    .pill.blue { background: #EEF4FF; color: #1D4ED8; }
+
+    .product-card { position: relative; overflow: hidden; }
+    .product-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--gold);
+    }
+    .product-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
+    .product-head h3 { margin: 0; color: var(--navy); font-size: 17px; }
+    .product-head p { margin: 5px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+    .metric-line { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .metric-box { background: #F8FAFC; border: 1px solid #EDF2F7; border-radius: 14px; padding: 11px; }
+    .metric-box label { display: block; color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .06em; }
+    .metric-box strong { display: block; margin-top: 6px; color: var(--navy); font-size: 18px; letter-spacing: -.4px; }
+
+    .chart-card { min-height: 360px; }
+    .chart-wrap { width: 100%; height: 300px; position: relative; }
+    canvas { width: 100%; height: 100%; }
+
+    .formula-box {
+      background: linear-gradient(135deg, #F8FAFC, #FFFFFF);
+      border: 1px solid #E7EBF2;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.55;
+    }
+    .formula-box code {
+      background: #F3F4F6;
+      color: #111827;
+      border: 1px solid #E5E7EB;
+      padding: 2px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .scenario-box {
+      border: 1px solid #E5E7EB;
+      background: #fff;
+      border-radius: 16px;
+      padding: 15px;
+    }
+    .scenario-box label { font-size: 12px; color: var(--muted); font-weight: 850; text-transform: uppercase; letter-spacing: .06em; }
+    .scenario-box .value { font-size: 22px; color: var(--navy); font-weight: 900; margin: 8px 0; }
+    .scenario-box .explain { color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+    .hidden { display: none !important; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .62);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(860px, 96vw);
+      max-height: 88vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 28px 70px rgba(0,0,0,.28);
+      padding: 24px;
+    }
+    .modal-header { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; border-bottom: 1px solid #E5E7EB; padding-bottom: 14px; margin-bottom: 16px; }
+    .modal-header h2 { margin: 0; color: var(--navy); }
+    .modal-close { background: #F1F5F9; color: var(--navy); }
+
+    .break-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+    .break-cell { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 14px; padding: 13px; }
+    .break-cell label { color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .06em; }
+    .break-cell strong { display: block; margin-top: 6px; color: var(--navy); font-size: 20px; }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .notice {
+      border: 1px solid #F1D59E;
+      background: #FFF8E8;
+      color: #6B4B09;
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .positive { color: var(--green) !important; }
+    .negative { color: var(--red) !important; }
+
+    @media (max-width: 1180px) {
+      .grid.kpi { grid-template-columns: repeat(2, 1fr); }
+      .grid.two { grid-template-columns: 1fr; }
+      .grid.cards { grid-template-columns: repeat(2, 1fr); }
+      .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 720px) {
+      .hero { padding: 24px 18px 52px; }
+      .container { width: calc(100% - 18px); margin-top: -42px; }
+      .grid.kpi, .grid.cards, .grid.three, .scenario-grid, .break-grid { grid-template-columns: 1fr; }
+      .card { padding: 16px; }
+      .tabs { gap: 7px; }
+      .tab { padding: 10px 11px; font-size: 12px; }
+      .slider-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .hero-actions, .tabs, .toolbar, .mini-btn, button, .modal-backdrop { display: none !important; }
+      .container { width: 100%; margin: 0; }
+      .hero { padding: 18px; color: #fff; }
+      .card { box-shadow: none; break-inside: avoid; }
+      .view { display: block !important; }
+      .chart-card { min-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="brand-badge"><span class="logo-mark">R</span><span>Rexo Software Products</span></div>
+        <h1>Investor Revenue, Profitability & Valuation Dashboard</h1>
+        <p class="subtitle">A live decision-making model for product-wise subscription revenue, cost control, break-even analysis, pricing sensitivity, subscription targets, profit protection and investment valuation.</p>
+        <div class="hero-actions">
+          <button class="primary" onclick="showView('dashboard')">Open Dashboard</button>
+          <button class="secondary" onclick="window.print()">Print / Save as PDF</button>
+          <button class="secondary" onclick="exportCSV()">Export Product CSV</button>
+          <button class="secondary" onclick="saveScenario()">Save Scenario</button>
+        </div>
+      </div>
+      <div class="formula-box" style="max-width: 360px; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.86);">
+        <strong style="color:#fff;">Investor use case</strong><br>
+        Change product price, subscriptions, cost ratios, growth, churn, fixed cost and valuation multiple. The dashboard recalculates revenue, profit, break-even subscribers and valuation instantly.
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs">
+      <button class="tab active" data-view="dashboard" onclick="showView('dashboard')">Executive Dashboard</button>
+      <button class="tab" data-view="model" onclick="showView('model')">Product Model</button>
+      <button class="tab" data-view="scenario" onclick="showView('scenario')">Scenario Lab</button>
+      <button class="tab" data-view="projection" onclick="showView('projection')">36-Month Projection</button>
+      <button class="tab" data-view="valuation" onclick="showView('valuation')">Valuation</button>
+    </nav>
+
+    <div class="notice">
+      <strong>Note:</strong> Current figures are editable sample assumptions for investor presentation. Replace prices, subscribers, recurring percentage and cost assumptions with your actual numbers. All calculations are rule-based mathematical calculations only.
+    </div>
+
+    <section id="dashboard" class="view">
+      <div class="grid kpi" id="kpiCards"></div>
+
+      <div class="grid two" style="margin-top:18px;">
+        <div class="card chart-card">
+          <div class="section-title">
+            <div>
+              <h2>Product-wise Monthly Revenue</h2>
+              <p>Immediate comparison of current subscription revenue by product.</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="section-title">
+            <div>
+              <h2>Profitability Mix</h2>
+              <p>Shows which product is creating positive contribution after variable and fixed costs.</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-title">
+          <div>
+            <h2>Investor Snapshot by Product</h2>
+            <p>Revenue, expense, recurring ratio, profit, margin, break-even and valuation in one view.</p>
+          </div>
+          <div class="toolbar">
+            <button class="mini-btn success-btn" onclick="openAllBreakEven()">Check All Break-even</button>
+            <button class="mini-btn" onclick="showView('model')">Edit Assumptions</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="snapshotTable"></table>
+        </div>
+      </div>
+
+      <div class="grid cards" id="productCards" style="margin-top:18px;"></div>
+    </section>
+
+    <section id="model" class="view hidden">
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <h2>Editable Product Revenue Model</h2>
+            <p>Change subscription fee, subscription count, cost ratios and fixed costs. Results update instantly.</p>
+          </div>
+          <div class="toolbar">
+            <button class="mini-btn" onclick="addProduct()">+ Add Product</button>
+            <button class="mini-btn danger-btn" onclick="resetModel()">Reset Sample Model</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="editableTable"></table>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:18px;">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Target Profit / Investment Recovery Calculator</h2>
+              <p>Enter target monthly profit or target monthly amount and calculate required price/subscriptions.</p>
+            </div>
+          </div>
+          <div class="scenario-grid">
+            <div class="scenario-box">
+              <label>Selected Product</label>
+              <select id="targetProduct" onchange="renderAll()"></select>
+            </div>
+            <div class="scenario-box">
+              <label>Target Monthly Profit</label>
+              <input id="targetProfit" type="number" value="300000" step="10000" onchange="renderAll()" oninput="renderAll()" />
+            </div>
+            <div class="scenario-box">
+              <label>Target Recovery Amount</label>
+              <input id="targetRecovery" type="number" value="2500000" step="100000" onchange="renderAll()" oninput="renderAll()" />
+            </div>
+            <div class="scenario-box">
+              <label>Recovery Period</label>
+              <input id="recoveryMonths" type="number" value="12" min="1" step="1" onchange="renderAll()" oninput="renderAll()" />
+            </div>
+          </div>
+          <div id="targetOutput" class="formula-box" style="margin-top:16px;"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Formula Logic</h2>
+              <p>Transparent formulas for investor confidence.</p>
+            </div>
+          </div>
+          <div class="formula-box">
+            <strong>Monthly Revenue</strong> = Subscription Fee × No. of Subscriptions<br>
+            <strong>Total Variable Expense</strong> = Revenue × (Development & Infrastructure % + Marketing & Support % + Loss Reserve %)<br>
+            <strong>Profit</strong> = Revenue − Variable Expense − Fixed Monthly Cost<br>
+            <strong>Break-even Subscribers</strong> = Fixed Monthly Cost ÷ Contribution per Subscriber<br>
+            <strong>Contribution per Subscriber</strong> = Fee × (1 − Total Variable Cost %)<br>
+            <strong>Valuation</strong> = Weighted ARR Multiple + Weighted Profit Multiple
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenario" class="view hidden">
+      <div class="grid two">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Live Scenario Controls</h2>
+              <p>Drag sliders to see how pricing, subscriptions, cost increase or churn affects the entire business.</p>
+            </div>
+            <button class="mini-btn danger-btn" onclick="resetScenario()">Reset Scenario</button>
+          </div>
+
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Price Change</strong><span id="priceChangeLabel"></span></div>
+              <input id="priceChange" type="range" min="-50" max="150" value="0" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="priceChangeNum" onchange="syncRange('priceChange', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Subscription Count Change</strong><span id="subChangeLabel"></span></div>
+              <input id="subChange" type="range" min="-70" max="300" value="0" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="subChangeNum" onchange="syncRange('subChange', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Development & Infrastructure Cost Change</strong><span id="devChangeLabel"></span></div>
+              <input id="devChange" type="range" min="-20" max="80" value="0" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="devChangeNum" onchange="syncRange('devChange', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Marketing & Support Cost Change</strong><span id="mktChangeLabel"></span></div>
+              <input id="mktChange" type="range" min="-20" max="80" value="0" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="mktChangeNum" onchange="syncRange('mktChange', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Fixed Cost Change</strong><span id="fixedChangeLabel"></span></div>
+              <input id="fixedChange" type="range" min="-40" max="120" value="0" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="fixedChangeNum" onchange="syncRange('fixedChange', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Unexpected Loss Reserve</strong><span id="reserveLabel"></span></div>
+              <input id="lossReserve" type="range" min="0" max="35" value="5" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="lossReserveNum" onchange="syncRange('lossReserve', this.value)" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Scenario Result</h2>
+              <p>Direct impact on revenue, profit and valuation.</p>
+            </div>
+          </div>
+          <div class="scenario-grid" id="scenarioResult"></div>
+          <div class="formula-box" style="margin-top:16px;">
+            <strong>No-loss logic:</strong> If contribution margin becomes low or negative, the dashboard flags the risk and calculates the revised minimum subscription count or revised subscription fee required to avoid loss.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projection" class="view hidden">
+      <div class="grid two">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>36-Month Projection Controls</h2>
+              <p>Monthly growth, churn, annual price increase and cost inflation assumptions.</p>
+            </div>
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Monthly New Subscription Growth</strong><span id="growthLabel"></span></div>
+              <input id="growthRate" type="range" min="0" max="20" value="5" step=".5" oninput="renderAll()" />
+            </div>
+            <input type="number" id="growthRateNum" step=".5" onchange="syncRange('growthRate', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Monthly Churn</strong><span id="churnLabel"></span></div>
+              <input id="churnRate" type="range" min="0" max="15" value="2" step=".5" oninput="renderAll()" />
+            </div>
+            <input type="number" id="churnRateNum" step=".5" onchange="syncRange('churnRate', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Annual Price Increase</strong><span id="annualPriceLabel"></span></div>
+              <input id="annualPriceIncrease" type="range" min="0" max="50" value="10" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="annualPriceIncreaseNum" onchange="syncRange('annualPriceIncrease', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Annual Fixed Cost Inflation</strong><span id="costInflationLabel"></span></div>
+              <input id="costInflation" type="range" min="0" max="40" value="8" step="1" oninput="renderAll()" />
+            </div>
+            <input type="number" id="costInflationNum" onchange="syncRange('costInflation', this.value)" />
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="section-title">
+            <div>
+              <h2>Projection Trend</h2>
+              <p>Monthly revenue and profit trend over 36 months.</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="projectionChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-title">
+          <div>
+            <h2>36-Month Projection Table</h2>
+            <p>Month-wise consolidated SaaS revenue, expenses, profit and cumulative cash result.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="projectionTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <section id="valuation" class="view hidden">
+      <div class="grid two">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Valuation Assumptions</h2>
+              <p>Use conservative investor-ready multiples. Adjust based on traction, retention, market size and product moat.</p>
+            </div>
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>ARR Revenue Multiple</strong><span id="arrMultipleLabel"></span></div>
+              <input id="arrMultiple" type="range" min="1" max="12" value="4" step=".25" oninput="renderAll()" />
+            </div>
+            <input type="number" id="arrMultipleNum" step=".25" onchange="syncRange('arrMultiple', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>Profit Multiple</strong><span id="profitMultipleLabel"></span></div>
+              <input id="profitMultiple" type="range" min="1" max="20" value="8" step=".5" oninput="renderAll()" />
+            </div>
+            <input type="number" id="profitMultipleNum" step=".5" onchange="syncRange('profitMultiple', this.value)" />
+          </div>
+          <div class="slider-row">
+            <div>
+              <div class="slider-label"><strong>ARR Weight</strong><span id="arrWeightLabel"></span></div>
+              <input id="arrWeight" type="range" min="0" max="100" value="60" step="5" oninput="renderAll()" />
+            </div>
+            <input type="number" id="arrWeightNum" step="5" onchange="syncRange('arrWeight', this.value)" />
+          </div>
+          <div class="formula-box" style="margin-top:14px;">
+            <strong>Balanced valuation formula:</strong><br>
+            Valuation = (ARR × ARR Multiple × ARR Weight) + (Annual Profit × Profit Multiple × Profit Weight).<br>
+            Loss-making products are valued mainly on ARR, but profit risk is clearly visible.
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="section-title">
+            <div>
+              <h2>Product-level Valuation</h2>
+              <p>Indicative valuation split by product.</p>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="valuationChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-title">
+          <div>
+            <h2>Valuation Table</h2>
+            <p>Product ARR, annual profit, risk status and valuation indicator for investment discussion.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="valuationTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      Prepared as a presentation-ready investor model for RexoBooks, RexoPayroll, RexoCompliance OS, PracticeDesk, RexoGST and Siteledge. Replace sample numbers with validated actuals before formal investor circulation.
+    </div>
+  </main>
+</div>
+
+<div id="breakModal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="breakTitle">Break-even Analysis</h2>
+        <p id="breakSub" style="margin:5px 0 0;color:var(--muted);font-size:13px;">Product-wise no-loss calculator</p>
+      </div>
+      <button class="modal-close" onclick="closeBreakEven()">Close</button>
+    </div>
+    <div id="breakContent"></div>
+  </div>
+</div>
+
+<script>
+const sampleProducts = [
+  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 120, recurring: 86, dev: 22, mkt: 18, fixed: 120000 },
+  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 150, recurring: 88, dev: 18, mkt: 18, fixed: 80000 },
+  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 65, recurring: 82, dev: 20, mkt: 20, fixed: 95000 },
+  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 180, recurring: 84, dev: 16, mkt: 18, fixed: 60000 },
+  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 110, recurring: 85, dev: 22, mkt: 18, fixed: 100000 },
+  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 35, recurring: 80, dev: 25, mkt: 20, fixed: 160000 }
+];
+
+let products = JSON.parse(localStorage.getItem('rexoInvestorProducts') || 'null') || structuredClone(sampleProducts);
+
+const INR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+const NUM = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
+const ONE_DEC = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 1 });
+
+function money(v) { return INR.format(Math.round(v || 0)); }
+function num(v) { return NUM.format(Math.round(v || 0)); }
+function pct(v) { return `${ONE_DEC.format(v || 0)}%`; }
+function val(id) { return Number(document.getElementById(id)?.value || 0); }
+
+function getScenario() {
+  return {
+    priceChange: val('priceChange') / 100,
+    subChange: val('subChange') / 100,
+    devChange: val('devChange'),
+    mktChange: val('mktChange'),
+    fixedChange: val('fixedChange') / 100,
+    lossReserve: val('lossReserve'),
+    growthRate: val('growthRate') / 100,
+    churnRate: val('churnRate') / 100,
+    annualPriceIncrease: val('annualPriceIncrease') / 100,
+    costInflation: val('costInflation') / 100,
+    arrMultiple: val('arrMultiple'),
+    profitMultiple: val('profitMultiple'),
+    arrWeight: val('arrWeight') / 100,
+  };
+}
+
+function calcProduct(p, sc = getScenario()) {
+  const fee = Math.max(0, p.fee * (1 + sc.priceChange));
+  const subs = Math.max(0, p.subs * (1 + sc.subChange));
+  const revenue = fee * subs;
+  const recurringRevenue = revenue * (p.recurring / 100);
+  const devPct = Math.max(0, p.dev + sc.devChange);
+  const mktPct = Math.max(0, p.mkt + sc.mktChange);
+  const reservePct = Math.max(0, sc.lossReserve);
+  const variablePct = Math.min(95, devPct + mktPct + reservePct);
+  const devCost = revenue * (devPct / 100);
+  const mktCost = revenue * (mktPct / 100);
+  const reserveCost = revenue * (reservePct / 100);
+  const fixedCost = Math.max(0, p.fixed * (1 + sc.fixedChange));
+  const totalExpense = devCost + mktCost + reserveCost + fixedCost;
+  const profit = revenue - totalExpense;
+  const margin = revenue ? profit / revenue * 100 : 0;
+  const contributionPerSub = fee * (1 - variablePct / 100);
+  const breakevenSubs = contributionPerSub > 0 ? Math.ceil(fixedCost / contributionPerSub) : Infinity;
+  const requiredPriceForCurrentSubs = subs > 0 && (1 - variablePct / 100) > 0 ? fixedCost / (subs * (1 - variablePct / 100)) : Infinity;
+  const arr = revenue * 12;
+  const annualProfit = profit * 12;
+  const profitWeight = 1 - sc.arrWeight;
+  const valuation = Math.max(0, arr * sc.arrMultiple * sc.arrWeight + Math.max(0, annualProfit) * sc.profitMultiple * profitWeight);
+  const risk = profit >= 0 ? 'Profit' : 'Loss Risk';
+  return { ...p, fee, subs, revenue, recurringRevenue, devPct, mktPct, reservePct, variablePct, devCost, mktCost, reserveCost, fixedCost, totalExpense, profit, margin, contributionPerSub, breakevenSubs, requiredPriceForCurrentSubs, arr, annualProfit, valuation, risk };
+}
+
+function calcAll() {
+  return products.map(p => calcProduct(p));
+}
+
+function totals(rows = calcAll()) {
+  return rows.reduce((a, r) => {
+    a.revenue += r.revenue;
+    a.recurringRevenue += r.recurringRevenue;
+    a.totalExpense += r.totalExpense;
+    a.profit += r.profit;
+    a.arr += r.arr;
+    a.annualProfit += r.annualProfit;
+    a.valuation += r.valuation;
+    a.subs += r.subs;
+    a.fixedCost += r.fixedCost;
+    return a;
+  }, { revenue:0, recurringRevenue:0, totalExpense:0, profit:0, arr:0, annualProfit:0, valuation:0, subs:0, fixedCost:0 });
+}
+
+function renderKpis(rows) {
+  const t = totals(rows);
+  const profitClass = t.profit >= 0 ? 'positive' : 'negative';
+  const avgMargin = t.revenue ? t.profit / t.revenue * 100 : 0;
+  document.getElementById('kpiCards').innerHTML = `
+    <div class="card kpi-card"><div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${money(t.revenue)}</div></div><div class="kpi-note">Current scenario revenue across all products.</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">Monthly Profit</div><div class="kpi-value ${profitClass}">${money(t.profit)}</div></div><div class="kpi-note">After variable cost, fixed cost and loss reserve.</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">ARR</div><div class="kpi-value">${money(t.arr)}</div></div><div class="kpi-note">Annual recurring revenue run-rate.</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">Blended Margin</div><div class="kpi-value ${avgMargin >= 0 ? 'positive' : 'negative'}">${pct(avgMargin)}</div></div><div class="kpi-note">Portfolio-level monthly profit margin.</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">Indicative Valuation</div><div class="kpi-value">${money(t.valuation)}</div></div><div class="kpi-note">Based on valuation assumptions.</div></div>`;
+}
+
+function renderSnapshot(rows) {
+  const t = totals(rows);
+  const body = rows.map((r, i) => `
+    <tr>
+      <td><strong>${r.name}</strong><br><span style="color:var(--muted);font-size:11px;">${r.desc}</span></td>
+      <td>${money(r.fee)}</td>
+      <td>${num(r.subs)}</td>
+      <td>${money(r.revenue)}</td>
+      <td>${money(r.totalExpense)}</td>
+      <td>${pct(r.recurring)}</td>
+      <td class="${r.profit >= 0 ? 'positive' : 'negative'}"><strong>${money(r.profit)}</strong></td>
+      <td class="${r.margin >= 0 ? 'positive' : 'negative'}">${pct(r.margin)}</td>
+      <td>${r.breakevenSubs === Infinity ? 'Not possible' : num(r.breakevenSubs)}</td>
+      <td>${money(r.valuation)}</td>
+      <td><button class="mini-btn" onclick="openBreakEven(${i})">Break-even</button></td>
+    </tr>`).join('');
+  document.getElementById('snapshotTable').innerHTML = `
+    <thead><tr><th>Product</th><th>Fee</th><th>Subscriptions</th><th>Revenue</th><th>Expenses</th><th>Recurring %</th><th>Profit</th><th>Margin</th><th>Break-even Subs</th><th>Valuation</th><th>Action</th></tr></thead>
+    <tbody>${body}
+      <tr class="total-row"><td>Total Portfolio</td><td>-</td><td>${num(t.subs)}</td><td>${money(t.revenue)}</td><td>${money(t.totalExpense)}</td><td>-</td><td class="${t.profit >= 0 ? 'positive' : 'negative'}">${money(t.profit)}</td><td>${pct(t.revenue ? t.profit/t.revenue*100 : 0)}</td><td>-</td><td>${money(t.valuation)}</td><td>-</td></tr>
+    </tbody>`;
+}
+
+function renderProductCards(rows) {
+  document.getElementById('productCards').innerHTML = rows.map((r, i) => `
+    <div class="card product-card">
+      <div class="product-head">
+        <div><h3>${r.name}</h3><p>${r.desc}</p></div>
+        <span class="pill ${r.profit >= 0 ? 'green' : 'red'}">${r.profit >= 0 ? 'Profitable' : 'Needs Action'}</span>
+      </div>
+      <div class="metric-line">
+        <div class="metric-box"><label>Monthly Revenue</label><strong>${money(r.revenue)}</strong></div>
+        <div class="metric-box"><label>Monthly Profit</label><strong class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</strong></div>
+        <div class="metric-box"><label>Break-even Subs</label><strong>${r.breakevenSubs === Infinity ? 'N/A' : num(r.breakevenSubs)}</strong></div>
+        <div class="metric-box"><label>Valuation</label><strong>${money(r.valuation)}</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+        <button class="mini-btn" onclick="openBreakEven(${i})">Product Break-even</button>
+        <button class="mini-btn" onclick="showView('model')">Edit</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderEditableTable() {
+  const rows = products.map((p, i) => `
+    <tr>
+      <td><input type="text" value="${escapeHtml(p.name)}" onchange="updateProduct(${i}, 'name', this.value)"><br><input type="text" value="${escapeHtml(p.desc)}" onchange="updateProduct(${i}, 'desc', this.value)" style="margin-top:6px;font-size:12px;"></td>
+      <td><input type="number" value="${p.fee}" step="100" onchange="updateProduct(${i}, 'fee', this.value)" oninput="updateProduct(${i}, 'fee', this.value, true)"></td>
+      <td><input type="number" value="${p.subs}" step="1" onchange="updateProduct(${i}, 'subs', this.value)" oninput="updateProduct(${i}, 'subs', this.value, true)"></td>
+      <td><input type="number" value="${p.recurring}" step="1" min="0" max="100" onchange="updateProduct(${i}, 'recurring', this.value)" oninput="updateProduct(${i}, 'recurring', this.value, true)"></td>
+      <td><input type="number" value="${p.dev}" step="1" min="0" max="90" onchange="updateProduct(${i}, 'dev', this.value)" oninput="updateProduct(${i}, 'dev', this.value, true)"></td>
+      <td><input type="number" value="${p.mkt}" step="1" min="0" max="90" onchange="updateProduct(${i}, 'mkt', this.value)" oninput="updateProduct(${i}, 'mkt', this.value, true)"></td>
+      <td><input type="number" value="${p.fixed}" step="10000" onchange="updateProduct(${i}, 'fixed', this.value)" oninput="updateProduct(${i}, 'fixed', this.value, true)"></td>
+      <td><button class="mini-btn danger-btn" onclick="removeProduct(${i})">Remove</button></td>
+    </tr>`).join('');
+  document.getElementById('editableTable').innerHTML = `
+    <thead><tr><th>Product</th><th>Subscription Fee</th><th>No. of Subscriptions</th><th>Recurring %</th><th>Dev + Infra %</th><th>Marketing + Support %</th><th>Fixed Monthly Cost</th><th>Action</th></tr></thead>
+    <tbody>${rows}</tbody>`;
+  const select = document.getElementById('targetProduct');
+  const current = select.value;
+  select.innerHTML = products.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+  if (current && products[current]) select.value = current;
+}
+
+function renderTargetOutput() {
+  const i = Number(document.getElementById('targetProduct')?.value || 0);
+  const p = products[i] || products[0];
+  if (!p) return;
+  const r = calcProduct(p);
+  const targetProfit = val('targetProfit');
+  const recoveryAmount = val('targetRecovery');
+  const months = Math.max(1, val('recoveryMonths'));
+  const requiredMonthlyProfit = targetProfit + recoveryAmount / months;
+  const variableFactor = 1 - r.variablePct / 100;
+  const requiredSubsForTarget = variableFactor > 0 ? Math.ceil((r.fixedCost + requiredMonthlyProfit) / (r.fee * variableFactor)) : Infinity;
+  const requiredPriceForTarget = r.subs > 0 && variableFactor > 0 ? (r.fixedCost + requiredMonthlyProfit) / (r.subs * variableFactor) : Infinity;
+  const currentGap = requiredMonthlyProfit - r.profit;
+  document.getElementById('targetOutput').innerHTML = `
+    <strong>${r.name} Target Calculation</strong><br>
+    Current monthly profit is <strong class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</strong>.
+    To achieve target monthly profit of <strong>${money(targetProfit)}</strong> plus recovery of <strong>${money(recoveryAmount)}</strong> over <strong>${num(months)} months</strong>, required monthly profit is <strong>${money(requiredMonthlyProfit)}</strong>.<br><br>
+    Required subscriptions at current price: <strong>${requiredSubsForTarget === Infinity ? 'Not possible under current cost %' : num(requiredSubsForTarget)}</strong><br>
+    Required subscription fee at current subscription count: <strong>${requiredPriceForTarget === Infinity ? 'Not possible' : money(requiredPriceForTarget)}</strong><br>
+    Current gap to target: <strong class="${currentGap <= 0 ? 'positive' : 'negative'}">${money(currentGap)}</strong>`;
+}
+
+function renderScenario(rows) {
+  const t = totals(rows);
+  const baseRows = products.map(p => calcProduct(p, { ...getScenario(), priceChange:0, subChange:0, devChange:0, mktChange:0, fixedChange:0 }));
+  const base = totals(baseRows);
+  const revenueChange = base.revenue ? (t.revenue - base.revenue) / base.revenue * 100 : 0;
+  const profitChange = base.profit ? (t.profit - base.profit) / Math.abs(base.profit) * 100 : 0;
+  document.getElementById('scenarioResult').innerHTML = `
+    <div class="scenario-box"><label>Scenario Revenue</label><div class="value">${money(t.revenue)}</div><div class="explain ${revenueChange >= 0 ? 'positive' : 'negative'}">${pct(revenueChange)} vs base</div></div>
+    <div class="scenario-box"><label>Scenario Profit</label><div class="value ${t.profit >= 0 ? 'positive' : 'negative'}">${money(t.profit)}</div><div class="explain ${profitChange >= 0 ? 'positive' : 'negative'}">${pct(profitChange)} vs base</div></div>
+    <div class="scenario-box"><label>Scenario ARR</label><div class="value">${money(t.arr)}</div><div class="explain">Annual recurring revenue run-rate.</div></div>
+    <div class="scenario-box"><label>Scenario Valuation</label><div class="value">${money(t.valuation)}</div><div class="explain">Based on selected valuation multiple.</div></div>`;
+}
+
+function renderProjection() {
+  const sc = getScenario();
+  let months = [];
+  let cumulative = 0;
+  for (let m=1; m<=36; m++) {
+    const yearIndex = Math.floor((m-1)/12);
+    const monthRows = products.map(p => {
+      const effectiveSubs = p.subs * Math.pow(1 + sc.growthRate - sc.churnRate, m-1) * (1 + sc.subChange);
+      const effectiveFee = p.fee * Math.pow(1 + sc.annualPriceIncrease, yearIndex) * (1 + sc.priceChange);
+      const effectiveFixed = p.fixed * Math.pow(1 + sc.costInflation, yearIndex) * (1 + sc.fixedChange);
+      const devPct = Math.max(0, p.dev + sc.devChange);
+      const mktPct = Math.max(0, p.mkt + sc.mktChange);
+      const reservePct = Math.max(0, sc.lossReserve);
+      const revenue = effectiveFee * effectiveSubs;
+      const totalExpense = revenue * ((devPct+mktPct+reservePct)/100) + effectiveFixed;
+      const profit = revenue - totalExpense;
+      return { revenue, totalExpense, profit, subs: effectiveSubs };
+    });
+    const revenue = monthRows.reduce((a,b)=>a+b.revenue,0);
+    const totalExpense = monthRows.reduce((a,b)=>a+b.totalExpense,0);
+    const profit = revenue - totalExpense;
+    const subs = monthRows.reduce((a,b)=>a+b.subs,0);
+    cumulative += profit;
+    months.push({ m, revenue, totalExpense, profit, cumulative, subs });
+  }
+  const body = months.map(x => `<tr><td>Month ${x.m}</td><td>${num(x.subs)}</td><td>${money(x.revenue)}</td><td>${money(x.totalExpense)}</td><td class="${x.profit >= 0 ? 'positive' : 'negative'}"><strong>${money(x.profit)}</strong></td><td class="${x.cumulative >= 0 ? 'positive' : 'negative'}">${money(x.cumulative)}</td></tr>`).join('');
+  document.getElementById('projectionTable').innerHTML = `<thead><tr><th>Month</th><th>Subscriptions</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Cumulative Profit</th></tr></thead><tbody>${body}</tbody>`;
+  drawLineChart('projectionChart', months.map(x => `M${x.m}`), [months.map(x => x.revenue), months.map(x => x.profit)], ['Revenue', 'Profit']);
+}
+
+function renderValuation(rows) {
+  const body = rows.map(r => `
+    <tr>
+      <td><strong>${r.name}</strong></td>
+      <td>${money(r.arr)}</td>
+      <td class="${r.annualProfit >= 0 ? 'positive' : 'negative'}">${money(r.annualProfit)}</td>
+      <td>${pct(r.margin)}</td>
+      <td><span class="pill ${r.profit >= 0 ? 'green' : 'red'}">${r.risk}</span></td>
+      <td><strong>${money(r.valuation)}</strong></td>
+    </tr>`).join('');
+  const t = totals(rows);
+  document.getElementById('valuationTable').innerHTML = `<thead><tr><th>Product</th><th>ARR</th><th>Annual Profit</th><th>Margin</th><th>Status</th><th>Indicative Valuation</th></tr></thead><tbody>${body}<tr class="total-row"><td>Total Portfolio</td><td>${money(t.arr)}</td><td class="${t.annualProfit >= 0 ? 'positive' : 'negative'}">${money(t.annualProfit)}</td><td>${pct(t.arr ? t.annualProfit/t.arr*100 : 0)}</td><td>-</td><td>${money(t.valuation)}</td></tr></tbody>`;
+}
+
+function updateLabels() {
+  const mappings = [
+    ['priceChange', 'priceChangeLabel', 'priceChangeNum', '%'], ['subChange', 'subChangeLabel', 'subChangeNum', '%'], ['devChange', 'devChangeLabel', 'devChangeNum', ' pts'], ['mktChange', 'mktChangeLabel', 'mktChangeNum', ' pts'], ['fixedChange', 'fixedChangeLabel', 'fixedChangeNum', '%'], ['lossReserve', 'reserveLabel', 'lossReserveNum', '%'], ['growthRate', 'growthLabel', 'growthRateNum', '%'], ['churnRate', 'churnLabel', 'churnRateNum', '%'], ['annualPriceIncrease', 'annualPriceLabel', 'annualPriceIncreaseNum', '%'], ['costInflation', 'costInflationLabel', 'costInflationNum', '%'], ['arrMultiple', 'arrMultipleLabel', 'arrMultipleNum', 'x'], ['profitMultiple', 'profitMultipleLabel', 'profitMultipleNum', 'x'], ['arrWeight', 'arrWeightLabel', 'arrWeightNum', '%']
+  ];
+  mappings.forEach(([id, label, numId, suffix]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = Number(el.value);
+    const pretty = suffix === 'x' ? `${v}x` : suffix === ' pts' ? `${v >= 0 ? '+' : ''}${v} pts` : `${v >= 0 && ['priceChange','subChange','fixedChange'].includes(id) ? '+' : ''}${v}%`;
+    const lab = document.getElementById(label); if (lab) lab.textContent = pretty;
+    const num = document.getElementById(numId); if (num) num.value = v;
+  });
+}
+
+function renderAll() {
+  updateLabels();
+  const rows = calcAll();
+  renderKpis(rows);
+  renderSnapshot(rows);
+  renderProductCards(rows);
+  renderEditableTable();
+  renderTargetOutput();
+  renderScenario(rows);
+  renderProjection();
+  renderValuation(rows);
+  drawBarChart('revenueChart', rows.map(r => r.name), rows.map(r => r.revenue), 'Monthly Revenue');
+  drawBarChart('profitChart', rows.map(r => r.name), rows.map(r => r.profit), 'Monthly Profit');
+  drawBarChart('valuationChart', rows.map(r => r.name), rows.map(r => r.valuation), 'Indicative Valuation');
+  localStorage.setItem('rexoInvestorProducts', JSON.stringify(products));
+}
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === id));
+  setTimeout(renderAll, 50);
+}
+
+function updateProduct(i, key, value, soft=false) {
+  if (!products[i]) return;
+  if (['fee','subs','recurring','dev','mkt','fixed'].includes(key)) products[i][key] = Number(value || 0);
+  else products[i][key] = value;
+  if (!soft || key !== 'desc') renderAll();
+}
+
+function addProduct() {
+  products.push({ name: 'New Product', desc: 'New software product revenue model.', fee: 999, subs: 10, recurring: 80, dev: 20, mkt: 20, fixed: 50000 });
+  renderAll();
+}
+function removeProduct(i) { products.splice(i, 1); renderAll(); }
+function resetModel() { if (confirm('Reset product model to sample assumptions?')) { products = structuredClone(sampleProducts); localStorage.removeItem('rexoInvestorProducts'); renderAll(); } }
+function resetScenario() {
+  const defaults = { priceChange:0, subChange:0, devChange:0, mktChange:0, fixedChange:0, lossReserve:5, growthRate:5, churnRate:2, annualPriceIncrease:10, costInflation:8, arrMultiple:4, profitMultiple:8, arrWeight:60 };
+  Object.entries(defaults).forEach(([id,v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+  renderAll();
+}
+function syncRange(id, value) { const el = document.getElementById(id); if (el) { el.value = value; renderAll(); } }
+
+function openBreakEven(i) {
+  const r = calcProduct(products[i]);
+  const neededSubs = r.breakevenSubs;
+  const gapSubs = neededSubs === Infinity ? Infinity : Math.max(0, neededSubs - r.subs);
+  const noLossPrice = r.requiredPriceForCurrentSubs;
+  const content = `
+    <div class="break-grid">
+      <div class="break-cell"><label>Current Revenue</label><strong>${money(r.revenue)}</strong></div>
+      <div class="break-cell"><label>Current Profit / Loss</label><strong class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</strong></div>
+      <div class="break-cell"><label>Contribution / Subscriber</label><strong>${money(r.contributionPerSub)}</strong></div>
+      <div class="break-cell"><label>Break-even Subscriptions</label><strong>${neededSubs === Infinity ? 'Not possible' : num(neededSubs)}</strong></div>
+      <div class="break-cell"><label>Additional Subs Required</label><strong>${gapSubs === Infinity ? 'Not possible' : num(gapSubs)}</strong></div>
+      <div class="break-cell"><label>No-loss Price at Current Subs</label><strong>${noLossPrice === Infinity ? 'Not possible' : money(noLossPrice)}</strong></div>
+    </div>
+    <div class="formula-box">
+      <strong>Action interpretation for ${r.name}:</strong><br>
+      ${r.profit >= 0 ? 'This product is currently above break-even under the selected scenario.' : 'This product is below break-even. Increase subscription count, increase price, reduce fixed cost, or reduce variable cost percentage.'}<br><br>
+      Variable cost considered: <strong>${pct(r.variablePct)}</strong> including development/infrastructure, marketing/support and unexpected loss reserve.<br>
+      Fixed monthly cost considered: <strong>${money(r.fixedCost)}</strong>.<br>
+      Break-even formula: Fixed Monthly Cost ÷ Contribution per Subscriber.
+    </div>`;
+  document.getElementById('breakTitle').textContent = `${r.name} Break-even Analysis`;
+  document.getElementById('breakSub').textContent = 'Product-wise no-loss calculator';
+  document.getElementById('breakContent').innerHTML = content;
+  document.getElementById('breakModal').classList.add('open');
+}
+
+function openAllBreakEven() {
+  const rows = calcAll();
+  document.getElementById('breakTitle').textContent = 'Portfolio Break-even Analysis';
+  document.getElementById('breakSub').textContent = 'Product-wise required subscription count to avoid loss';
+  document.getElementById('breakContent').innerHTML = `<div class="table-wrap"><table><thead><tr><th>Product</th><th>Current Subs</th><th>Current Profit</th><th>Break-even Subs</th><th>Additional Subs Required</th><th>No-loss Price</th></tr></thead><tbody>${rows.map(r => `<tr><td><strong>${r.name}</strong></td><td>${num(r.subs)}</td><td class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</td><td>${r.breakevenSubs === Infinity ? 'Not possible' : num(r.breakevenSubs)}</td><td>${r.breakevenSubs === Infinity ? 'Not possible' : num(Math.max(0, r.breakevenSubs-r.subs))}</td><td>${r.requiredPriceForCurrentSubs === Infinity ? 'Not possible' : money(r.requiredPriceForCurrentSubs)}</td></tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('breakModal').classList.add('open');
+}
+function closeBreakEven() { document.getElementById('breakModal').classList.remove('open'); }
+
+function saveScenario() {
+  localStorage.setItem('rexoInvestorProducts', JSON.stringify(products));
+  alert('Scenario saved in this browser. It will reopen with the same product assumptions.');
+}
+
+function exportCSV() {
+  const rows = calcAll();
+  const header = ['Product','Subscription Fee','Subscriptions','Monthly Revenue','Expenses','Recurring %','Monthly Profit','Margin %','Break-even Subs','ARR','Annual Profit','Indicative Valuation'];
+  const data = rows.map(r => [r.name, Math.round(r.fee), Math.round(r.subs), Math.round(r.revenue), Math.round(r.totalExpense), r.recurring, Math.round(r.profit), r.margin.toFixed(2), r.breakevenSubs === Infinity ? 'Not possible' : r.breakevenSubs, Math.round(r.arr), Math.round(r.annualProfit), Math.round(r.valuation)]);
+  const csv = [header, ...data].map(row => row.map(v => `"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'Rexo_Investor_Product_Model.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+function escapeHtml(str) { return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#039;','"':'&quot;'}[c])); }
+
+function drawBarChart(id, labels, data, title) {
+  const canvas = document.getElementById(id); if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = Math.max(320, rect.width * devicePixelRatio);
+  canvas.height = Math.max(260, rect.height * devicePixelRatio);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  const pad = { l: 58, r: 20, t: 20, b: 76 };
+  const vals = data.map(Number);
+  const min = Math.min(0, ...vals);
+  const max = Math.max(1, ...vals);
+  const span = max - min || 1;
+  const chartW = w - pad.l - pad.r;
+  const chartH = h - pad.t - pad.b;
+  ctx.strokeStyle = '#E5E7EB'; ctx.lineWidth = 1;
+  ctx.font = '11px Inter, Segoe UI, Arial'; ctx.fillStyle = '#6B7280';
+  for (let i=0;i<=4;i++) {
+    const y = pad.t + chartH * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke();
+    const labelVal = max - span * i / 4;
+    ctx.fillText(formatCompact(labelVal), 4, y+4);
+  }
+  const zeroY = pad.t + chartH * (max / span);
+  ctx.strokeStyle = '#9CA3AF'; ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(w-pad.r, zeroY); ctx.stroke();
+  const gap = 12;
+  const barW = Math.max(18, (chartW - gap * (labels.length-1)) / labels.length);
+  labels.forEach((lab, i) => {
+    const v = vals[i];
+    const x = pad.l + i * (barW + gap);
+    const y = pad.t + chartH * ((max - Math.max(v,0)) / span);
+    const y0 = zeroY;
+    const bh = Math.abs(y0 - (pad.t + chartH * ((max - v) / span)));
+    ctx.fillStyle = v >= 0 ? '#C0A062' : '#B42318';
+    ctx.fillRect(x, v >= 0 ? y : y0, barW, Math.max(2,bh));
+    ctx.fillStyle = '#1A2942'; ctx.font = '700 10px Inter, Segoe UI, Arial';
+    const words = lab.split(' ');
+    let txt = lab.length > 12 ? lab.slice(0, 12) + '…' : lab;
+    ctx.save(); ctx.translate(x + barW/2, h - 12); ctx.rotate(-Math.PI/5); ctx.textAlign = 'right'; ctx.fillText(txt, 0, 0); ctx.restore();
+  });
+}
+
+function drawLineChart(id, labels, series, names) {
+  const canvas = document.getElementById(id); if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = Math.max(320, rect.width * devicePixelRatio);
+  canvas.height = Math.max(260, rect.height * devicePixelRatio);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  const pad = { l: 58, r: 20, t: 24, b: 42 };
+  const all = series.flat().map(Number);
+  const min = Math.min(0, ...all);
+  const max = Math.max(1, ...all);
+  const span = max - min || 1;
+  const chartW = w - pad.l - pad.r;
+  const chartH = h - pad.t - pad.b;
+  ctx.strokeStyle = '#E5E7EB'; ctx.lineWidth = 1;
+  ctx.font = '11px Inter, Segoe UI, Arial'; ctx.fillStyle = '#6B7280';
+  for (let i=0;i<=4;i++) {
+    const y = pad.t + chartH * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke();
+    ctx.fillText(formatCompact(max - span * i / 4), 4, y+4);
+  }
+  const colors = ['#C0A062', '#1A2942'];
+  series.forEach((data, si) => {
+    ctx.strokeStyle = colors[si]; ctx.lineWidth = 3; ctx.beginPath();
+    data.forEach((v, i) => {
+      const x = pad.l + chartW * i / (data.length-1);
+      const y = pad.t + chartH * ((max - v) / span);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    data.forEach((v, i) => {
+      if (i % 6 !== 0 && i !== data.length-1) return;
+      const x = pad.l + chartW * i / (data.length-1);
+      const y = pad.t + chartH * ((max - v) / span);
+      ctx.fillStyle = colors[si]; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    });
+  });
+  ctx.font = '700 12px Inter, Segoe UI, Arial';
+  names.forEach((name, i) => { ctx.fillStyle = colors[i]; ctx.fillText('● ' + name, pad.l + i*120, 14); });
+}
+
+function formatCompact(v) {
+  const n = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (n >= 10000000) return sign + '₹' + (n/10000000).toFixed(1) + 'Cr';
+  if (n >= 100000) return sign + '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000) return sign + '₹' + (n/1000).toFixed(0) + 'K';
+  return sign + '₹' + Math.round(n);
+}
+
+window.addEventListener('resize', () => setTimeout(renderAll, 120));
+window.addEventListener('click', e => { if (e.target.id === 'breakModal') closeBreakEven(); });
+renderAll();
+</script>
+</body>
+</html>
