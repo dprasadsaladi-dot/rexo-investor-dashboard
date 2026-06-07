@@ -256,6 +256,14 @@
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
     .brand-badge span:last-child { font-size: 15px; letter-spacing: .4px; }
+
+    /* Current/Target toggle */
+    .view-toggle { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .view-toggle .vt-label { font-size: 12px; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-right: 2px; }
+    .seg { background: #fff; color: var(--navy); border: 1px solid var(--line); border-radius: 11px; padding: 9px 15px; font-weight: 800; box-shadow: 0 4px 14px rgba(26,41,66,.05); }
+    .seg.active { background: linear-gradient(135deg, var(--navy), #0F1B2D); color: #fff; border-color: transparent; box-shadow: 0 8px 20px rgba(26,41,66,.22); }
+    .vt-note { font-size: 12px; color: var(--muted); margin-left: 4px; }
+    @media (max-width: 720px) { .vt-note { width: 100%; } }
   </style>
 </head>
 <body>
@@ -294,20 +302,26 @@
     </nav>
 
     <div class="notice">
-      <strong>Note:</strong> Figures shown are editable sample assumptions for presentation. Replace prices, subscribers, recurring %, churn, CAC and cost assumptions with your validated actuals. All outputs are deterministic mathematical calculations — there is no AI estimation in the numbers.
+      <strong>Stage — June 2026 (pre-revenue):</strong> 4 products (RexoBooks, RexoPayroll, PracticeDesk, Siteledge) in <strong>paid beta with 5 pilot companies</strong>; RexoGST &amp; RexoCompliance OS <strong>in development</strong>. Paid sales begin <strong>Dec 2026</strong> (beta-4) and <strong>Jun 2027</strong> (GST &amp; Compliance). Subscriber figures are <strong>targets at launch + 12 months</strong>. Use <strong>Current</strong> for today and <strong>Target</strong> for the plan. All outputs are deterministic calculations — no AI estimation. <em>Pilot fees are assumed at ~50% of list; edit them in Product Model.</em>
     </div>
 
     <!-- ============ EXECUTIVE DASHBOARD ============ -->
     <section id="dashboard" class="view">
+      <div class="view-toggle">
+        <span class="vt-label">View</span>
+        <button id="tgCurrent" class="seg" onclick="setViewMode('current')">Current · Jun '26</button>
+        <button id="tgTarget" class="seg active" onclick="setViewMode('target')">Target · Plan</button>
+        <span class="vt-note">Current = today's paid pilots &amp; burn · Target = run-rate at launch + 12 months</span>
+      </div>
       <div class="grid kpi" id="kpiCards"></div>
 
       <div class="grid two" style="margin-top:18px;">
         <div class="card chart-card">
-          <div class="section-title"><div><h2>Product-wise Monthly Revenue</h2><p>Immediate comparison of current subscription revenue by product.</p></div></div>
+          <div class="section-title"><div><h2>Product-wise Monthly Revenue</h2><p>By product — follows the Current / Target toggle above.</p></div></div>
           <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
         </div>
         <div class="card chart-card">
-          <div class="section-title"><div><h2>Profitability Mix</h2><p>Which product creates positive contribution after variable and fixed costs.</p></div></div>
+          <div class="section-title"><div><h2>Profitability Mix</h2><p>Contribution after variable and fixed costs — follows the toggle above.</p></div></div>
           <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
         </div>
       </div>
@@ -445,7 +459,12 @@
       </div>
 
       <div class="card" style="margin-top:18px;">
-        <div class="section-title"><div><h2>36-Month Projection Table</h2><p>Month-wise consolidated SaaS revenue, expenses, profit and cumulative cash result.</p></div></div>
+        <div class="section-title"><div><h2>Funding &amp; Break-even Summary</h2><p>The numbers an investor asks first: when you launch, when you break even, and how much cash it takes to get there.</p></div></div>
+        <div class="scenario-grid" id="projectionSummary"></div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-title"><div><h2>36-Month Projection Table</h2><p>Month-wise consolidated revenue, expenses, profit and cumulative cash (the J-curve from pilot burn to post-launch profit).</p></div></div>
         <div class="table-wrap"><table id="projectionTable"></table></div>
       </div>
     </section>
@@ -524,28 +543,47 @@
 </div>
 
 <script>
+// Stage as of June 2026 (pre-revenue):
+//  - status 'Beta'        => live with paid-pilot beta companies, paid launch at launchMonth
+//  - status 'Development' => still being built, no pilots, paid launch later
+//  betaCompanies = current paying pilots, pilotFee = current monthly fee per pilot (discounted)
+//  subs = TARGET paying subscribers at launch + 12 months, launchMonth = months from now (Jun 2026)
 const sampleProducts = [
-  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 120, recurring: 86, dev: 22, mkt: 18, fixed: 120000, churn: 2.0, cac: 2500 },
-  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 150, recurring: 88, dev: 18, mkt: 18, fixed: 80000, churn: 2.5, cac: 1800 },
-  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 65, recurring: 82, dev: 20, mkt: 20, fixed: 95000, churn: 2.0, cac: 4000 },
-  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 180, recurring: 84, dev: 16, mkt: 18, fixed: 60000, churn: 3.0, cac: 1200 },
-  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 110, recurring: 85, dev: 22, mkt: 18, fixed: 100000, churn: 2.5, cac: 2200 },
-  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 35, recurring: 80, dev: 25, mkt: 20, fixed: 160000, churn: 1.5, cac: 12000 }
+  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 120, recurring: 86, dev: 22, mkt: 18, fixed: 120000, churn: 2.0, cac: 2500, status: 'Beta', betaCompanies: 2, pilotFee: 749, launchMonth: 6 },
+  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 150, recurring: 88, dev: 18, mkt: 18, fixed: 80000, churn: 2.5, cac: 1800, status: 'Beta', betaCompanies: 1, pilotFee: 499, launchMonth: 6 },
+  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 65, recurring: 82, dev: 20, mkt: 20, fixed: 95000, churn: 2.0, cac: 4000, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
+  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 180, recurring: 84, dev: 16, mkt: 18, fixed: 60000, churn: 3.0, cac: 1200, status: 'Beta', betaCompanies: 1, pilotFee: 399, launchMonth: 6 },
+  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 110, recurring: 85, dev: 22, mkt: 18, fixed: 100000, churn: 2.5, cac: 2200, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
+  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 35, recurring: 80, dev: 25, mkt: 20, fixed: 160000, churn: 1.5, cac: 12000, status: 'Beta', betaCompanies: 1, pilotFee: 2499, launchMonth: 6 }
 ];
 
-const NUMERIC_KEYS = ['fee','subs','recurring','dev','mkt','fixed','churn','cac'];
+const NUMERIC_KEYS = ['fee','subs','recurring','dev','mkt','fixed','churn','cac','betaCompanies','pilotFee','launchMonth'];
+const PRODUCT_DEFAULTS = { churn: 2.0, cac: 0, status: 'Beta', betaCompanies: 0, pilotFee: 0, launchMonth: 6 };
 
 function loadProducts() {
   try {
     const raw = JSON.parse(localStorage.getItem('rexoInvestorProducts') || 'null');
     if (Array.isArray(raw) && raw.length) {
       // backfill any new fields for models saved by an older version
-      return raw.map(p => ({ churn: 2.0, cac: 0, ...p }));
+      return raw.map(p => ({ ...PRODUCT_DEFAULTS, ...p }));
     }
   } catch (e) {}
   return structuredClone(sampleProducts);
 }
 let products = loadProducts();
+
+// Dashboard view mode: 'target' (the plan) or 'current' (today's paid-pilot reality)
+let viewMode = 'target';
+
+// Calendar: month 0 = Jun 2026 (now). Projection month m -> Jun 2026 + m.
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function calMonth(m) { const d = new Date(2026, 5 + Math.round(m), 1); return `${MON[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`; }
+function isDev(p) { return (p.status || 'Beta') === 'Development'; }
+function productStage(p) {
+  if (isDev(p)) return { text: 'In Development', pill: 'blue', live: 'Paid ' + calMonth(p.launchMonth ?? 12) };
+  const n = p.betaCompanies ?? 0;
+  return { text: `Beta · ${n} pilot${n === 1 ? '' : 's'}`, pill: 'gold', live: 'Paid ' + calMonth(p.launchMonth ?? 6) };
+}
 
 const INR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
 const NUM = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
@@ -576,9 +614,12 @@ function getScenario() {
   };
 }
 
-function calcProduct(p, sc = getScenario()) {
-  const fee = Math.max(0, p.fee * (1 + sc.priceChange));
-  const subs = Math.max(0, p.subs * (1 + sc.subChange));
+function calcProduct(p, sc = getScenario(), mode = 'target') {
+  const isCurrent = mode === 'current';
+  const baseFee = isCurrent ? (p.pilotFee ?? 0) : p.fee;
+  const baseSubs = isCurrent ? (p.betaCompanies ?? 0) : p.subs;
+  const fee = Math.max(0, baseFee * (1 + sc.priceChange));
+  const subs = Math.max(0, baseSubs * (1 + sc.subChange));
   const revenue = fee * subs;
   const recurringRevenue = revenue * (p.recurring / 100);
   const devPct = Math.max(0, p.dev + sc.devChange);
@@ -614,7 +655,7 @@ function calcProduct(p, sc = getScenario()) {
   return { ...p, fee, subs, revenue, recurringRevenue, devPct, mktPct, reservePct, variablePct, devCost, mktCost, reserveCost, fixedCost, totalExpense, profit, margin, contributionPerSub, breakevenSubs, requiredPriceForCurrentSubs, arr, annualProfit, valuation, risk, churnMonthly, grossMarginPct, lifetimeMonths, arpu, ltv, cac, paybackMonths, ltvCac };
 }
 
-function calcAll(sc = getScenario()) { return products.map(p => calcProduct(p, sc)); }
+function calcAll(sc = getScenario(), mode = 'target') { return products.map(p => calcProduct(p, sc, mode)); }
 
 function totals(rows = calcAll()) {
   return rows.reduce((a, r) => {
@@ -631,51 +672,63 @@ function totals(rows = calcAll()) {
 /* ---------------- Dashboard ---------------- */
 function renderKpis(rows) {
   const t = totals(rows);
+  const cur = viewMode === 'current';
+  const tgt = cur ? totals(calcAll(getScenario(), 'target')) : t; // unit economics & valuation always on target pricing
   const profitClass = t.profit >= 0 ? 'positive' : 'negative';
   const avgMargin = t.revenue ? t.profit / t.revenue * 100 : 0;
-  const blendedLtvCac = t.cacSpend > 0 ? t.ltvWeighted / t.cacSpend : Infinity;
+  const blendedLtvCac = tgt.cacSpend > 0 ? tgt.ltvWeighted / tgt.cacSpend : Infinity;
+  const pref = cur ? 'Current' : 'Target';
+  const subsCount = cur ? products.reduce((a,p)=>a+(p.betaCompanies||0),0) : t.subs;
   document.getElementById('kpiCards').innerHTML = `
-    <div class="card kpi-card"><div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${money(t.revenue)}</div></div><div class="kpi-note">Current scenario revenue across all products.</div></div>
-    <div class="card kpi-card"><div><div class="kpi-label">Monthly Profit</div><div class="kpi-value ${profitClass}">${money(t.profit)}</div></div><div class="kpi-note">After variable cost, fixed cost and loss reserve.</div></div>
-    <div class="card kpi-card"><div><div class="kpi-label">ARR</div><div class="kpi-value">${money(t.arr)}</div></div><div class="kpi-note">Annual recurring revenue run-rate.</div></div>
-    <div class="card kpi-card"><div><div class="kpi-label">Blended Margin</div><div class="kpi-value ${avgMargin >= 0 ? 'positive' : 'negative'}">${pct(avgMargin)}</div></div><div class="kpi-note">Portfolio-level monthly profit margin.</div></div>
-    <div class="card kpi-card"><div><div class="kpi-label">Blended LTV:CAC</div><div class="kpi-value ${blendedLtvCac >= 3 ? 'positive' : blendedLtvCac >= 1 ? 'warn' : 'negative'}">${ratio(blendedLtvCac)}</div></div><div class="kpi-note">Subscriber-weighted lifetime value vs acquisition cost.</div></div>
-    <div class="card kpi-card"><div><div class="kpi-label">Indicative Valuation</div><div class="kpi-value">${money(t.valuation)}</div></div><div class="kpi-note">Based on valuation assumptions.</div></div>`;
+    <div class="card kpi-card"><div><div class="kpi-label">${pref} Monthly Revenue</div><div class="kpi-value">${money(t.revenue)}</div></div><div class="kpi-note">${cur ? 'Paid-pilot revenue today (Jun 2026).' : 'At each product launch + 12-month target run-rate.'}</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">${cur ? 'Monthly Burn' : 'Target Monthly Profit'}</div><div class="kpi-value ${profitClass}">${money(t.profit)}</div></div><div class="kpi-note">${cur ? 'Net cash today incl. full team/fixed cost.' : 'After variable, fixed cost and loss reserve.'}</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">${pref} ARR</div><div class="kpi-value">${money(t.arr)}</div></div><div class="kpi-note">${cur ? 'Pilot annual run-rate.' : 'Target annual recurring revenue.'}</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">${cur ? 'Paying Pilots' : 'Target Subscribers'}</div><div class="kpi-value">${num(subsCount)}</div></div><div class="kpi-note">${cur ? '5 beta companies across live products.' : 'Total paying base at target.'}</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">Blended LTV:CAC</div><div class="kpi-value ${blendedLtvCac >= 3 ? 'positive' : blendedLtvCac >= 1 ? 'warn' : 'negative'}">${ratio(blendedLtvCac)}</div></div><div class="kpi-note">Unit economics at target pricing.</div></div>
+    <div class="card kpi-card"><div><div class="kpi-label">${cur ? 'Valuation (target basis)' : 'Indicative Valuation'}</div><div class="kpi-value">${money(tgt.valuation)}</div></div><div class="kpi-note">Based on target plan &amp; valuation multiples.</div></div>`;
 }
 
 function renderSnapshot(rows) {
   const t = totals(rows);
-  const body = rows.map((r, i) => `
+  const cur = viewMode === 'current';
+  const subLabel = cur ? 'Pilots' : 'Target Subs';
+  const body = rows.map((r, i) => {
+    const st = productStage(r);
+    return `
     <tr>
       <td><strong>${escapeHtml(r.name)}</strong><br><span style="color:var(--muted);font-size:11px;">${escapeHtml(r.desc)}</span></td>
+      <td style="text-align:left;"><span class="pill ${st.pill}">${st.text}</span><br><span style="color:var(--muted);font-size:11px;">${st.live}</span></td>
       <td>${money(r.fee)}</td>
       <td>${num(r.subs)}</td>
       <td>${money(r.revenue)}</td>
       <td>${money(r.totalExpense)}</td>
-      <td>${pct(r.recurring)}</td>
       <td class="${r.profit >= 0 ? 'positive' : 'negative'}"><strong>${money(r.profit)}</strong></td>
       <td class="${r.margin >= 0 ? 'positive' : 'negative'}">${pct(r.margin)}</td>
       <td class="${r.ltvCac >= 3 ? 'positive' : r.ltvCac >= 1 ? 'warn' : 'negative'}">${ratio(r.ltvCac)}</td>
       <td>${r.breakevenSubs === Infinity ? 'Not possible' : num(r.breakevenSubs)}</td>
       <td>${money(r.valuation)}</td>
       <td><button class="mini-btn" onclick="openBreakEven(${i})">Break-even</button></td>
-    </tr>`).join('');
+    </tr>`; }).join('');
   const blended = t.cacSpend > 0 ? t.ltvWeighted / t.cacSpend : Infinity;
   document.getElementById('snapshotTable').innerHTML = `
-    <thead><tr><th>Product</th><th>Fee</th><th>Subscriptions</th><th>Revenue</th><th>Expenses</th><th>Recurring %</th><th>Profit</th><th>Margin</th><th>LTV:CAC</th><th>Break-even Subs</th><th>Valuation</th><th>Action</th></tr></thead>
+    <thead><tr><th>Product</th><th>Stage</th><th>Fee</th><th>${subLabel}</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Margin</th><th>LTV:CAC</th><th>Break-even Subs</th><th>Valuation</th><th>Action</th></tr></thead>
     <tbody>${body}
-      <tr class="total-row"><td>Total Portfolio</td><td>-</td><td>${num(t.subs)}</td><td>${money(t.revenue)}</td><td>${money(t.totalExpense)}</td><td>-</td><td class="${t.profit >= 0 ? 'positive' : 'negative'}">${money(t.profit)}</td><td>${pct(t.revenue ? t.profit/t.revenue*100 : 0)}</td><td>${ratio(blended)}</td><td>-</td><td>${money(t.valuation)}</td><td>-</td></tr>
+      <tr class="total-row"><td>Total Portfolio</td><td>-</td><td>-</td><td>${num(t.subs)}</td><td>${money(t.revenue)}</td><td>${money(t.totalExpense)}</td><td class="${t.profit >= 0 ? 'positive' : 'negative'}">${money(t.profit)}</td><td>${pct(t.revenue ? t.profit/t.revenue*100 : 0)}</td><td>${ratio(blended)}</td><td>-</td><td>${money(t.valuation)}</td><td>-</td></tr>
     </tbody>`;
 }
 
 function renderProductCards(rows) {
-  document.getElementById('productCards').innerHTML = rows.map((r, i) => `
+  const cur = viewMode === 'current';
+  document.getElementById('productCards').innerHTML = rows.map((r, i) => {
+    const st = productStage(r);
+    return `
     <div class="card product-card">
       <div class="product-head"><div><h3>${escapeHtml(r.name)}</h3><p>${escapeHtml(r.desc)}</p></div>
-        <span class="pill ${r.profit >= 0 ? 'green' : 'red'}">${r.profit >= 0 ? 'Profitable' : 'Needs Action'}</span></div>
+        <span class="pill ${st.pill}">${st.text}</span></div>
+      <div style="margin-top:8px;color:var(--muted);font-size:12px;font-weight:700;">${st.live}</div>
       <div class="metric-line">
-        <div class="metric-box"><label>Monthly Revenue</label><strong>${money(r.revenue)}</strong></div>
-        <div class="metric-box"><label>Monthly Profit</label><strong class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</strong></div>
+        <div class="metric-box"><label>${cur ? 'Pilot Revenue/mo' : 'Target Revenue/mo'}</label><strong>${money(r.revenue)}</strong></div>
+        <div class="metric-box"><label>${cur ? 'Net / mo' : 'Target Profit/mo'}</label><strong class="${r.profit >= 0 ? 'positive' : 'negative'}">${money(r.profit)}</strong></div>
         <div class="metric-box"><label>LTV : CAC</label><strong class="${r.ltvCac >= 3 ? 'positive' : r.ltvCac >= 1 ? 'warn' : 'negative'}">${ratio(r.ltvCac)}</strong></div>
         <div class="metric-box"><label>Valuation</label><strong>${money(r.valuation)}</strong></div>
       </div>
@@ -683,7 +736,7 @@ function renderProductCards(rows) {
         <button class="mini-btn" onclick="openBreakEven(${i})">Product Break-even</button>
         <button class="mini-btn" onclick="showView('model')">Edit</button>
       </div>
-    </div>`).join('');
+    </div>`; }).join('');
 }
 
 /* ---------------- Product Model ---------------- */
@@ -691,9 +744,12 @@ function renderEditableTable() {
   const rows = products.map((p, i) => `
     <tr>
       <td><input type="text" value="${escapeHtml(p.name)}" onchange="updateProduct(${i}, 'name', this.value)"><br><input type="text" value="${escapeHtml(p.desc)}" onchange="updateProduct(${i}, 'desc', this.value)" style="margin-top:6px;font-size:12px;"></td>
+      <td><select onchange="updateProduct(${i}, 'status', this.value)"><option value="Beta"${isDev(p)?'':' selected'}>Beta (live)</option><option value="Development"${isDev(p)?' selected':''}>In Development</option></select></td>
+      <td><input type="number" value="${p.betaCompanies ?? 0}" step="1" min="0" onchange="updateProduct(${i}, 'betaCompanies', this.value)"></td>
+      <td><input type="number" value="${p.pilotFee ?? 0}" step="100" min="0" onchange="updateProduct(${i}, 'pilotFee', this.value)"></td>
+      <td><input type="number" value="${p.launchMonth ?? 6}" step="1" min="0" max="36" onchange="updateProduct(${i}, 'launchMonth', this.value)" title="Months from now (Jun 2026) until paid launch"></td>
       <td><input type="number" value="${p.fee}" step="100" onchange="updateProduct(${i}, 'fee', this.value)"></td>
       <td><input type="number" value="${p.subs}" step="1" onchange="updateProduct(${i}, 'subs', this.value)"></td>
-      <td><input type="number" value="${p.recurring}" step="1" min="0" max="100" onchange="updateProduct(${i}, 'recurring', this.value)"></td>
       <td><input type="number" value="${p.dev}" step="1" min="0" max="90" onchange="updateProduct(${i}, 'dev', this.value)"></td>
       <td><input type="number" value="${p.mkt}" step="1" min="0" max="90" onchange="updateProduct(${i}, 'mkt', this.value)"></td>
       <td><input type="number" value="${p.fixed}" step="10000" onchange="updateProduct(${i}, 'fixed', this.value)"></td>
@@ -702,7 +758,7 @@ function renderEditableTable() {
       <td><button class="mini-btn danger-btn" onclick="removeProduct(${i})">Remove</button></td>
     </tr>`).join('');
   document.getElementById('editableTable').innerHTML = `
-    <thead><tr><th>Product</th><th>Fee</th><th>Subscriptions</th><th>Recurring %</th><th>Dev+Infra %</th><th>Mktg+Support %</th><th>Fixed Cost/mo</th><th>Churn %/mo</th><th>CAC ₹</th><th>Action</th></tr></thead>
+    <thead><tr><th>Product</th><th>Stage</th><th>Beta Pilots</th><th>Pilot Fee ₹</th><th>Launch (mo)</th><th>Target Fee ₹</th><th>Target Subs</th><th>Dev+Infra %</th><th>Mktg+Support %</th><th>Fixed Cost/mo</th><th>Churn %/mo</th><th>CAC ₹</th><th>Action</th></tr></thead>
     <tbody>${rows}</tbody>`;
   syncProductSelect('targetProduct');
   syncProductSelect('cohortProduct');
@@ -874,39 +930,72 @@ function renderScenarioCompare() {
 }
 
 /* ---------------- Projection ---------------- */
+// Realistic ramp: pre-launch = paid pilots only (dev products = nothing) but fixed cost
+// (the team) is being spent from day one. After launch, subscribers ramp linearly to the
+// target over 12 months, then grow at (growth - churn). Fixed cost inflates annually.
 function computeProjection(monthsCount = 36) {
   const sc = getScenario();
   let out = [];
-  let cumulative = 0;
+  let cumulative = 0, trough = 0, breakevenMonth = null, cashPositiveMonth = null;
   for (let m=1; m<=monthsCount; m++) {
     const yearIndex = Math.floor((m-1)/12);
     const monthRows = products.map(p => {
-      const effectiveSubs = p.subs * Math.pow(1 + sc.growthRate - sc.churnRate, m-1) * (1 + sc.subChange);
-      const effectiveFee = p.fee * Math.pow(1 + sc.annualPriceIncrease, yearIndex) * (1 + sc.priceChange);
-      const effectiveFixed = p.fixed * Math.pow(1 + sc.costInflation, yearIndex) * (1 + sc.fixedChange);
+      const L = Math.max(0, p.launchMonth ?? 6);
+      const dev = isDev(p);
       const devPct = Math.max(0, p.dev + sc.devChange);
       const mktPct = Math.max(0, p.mkt + sc.mktChange);
       const reservePct = Math.max(0, sc.lossReserve);
-      const revenue = effectiveFee * effectiveSubs;
+      const effectiveFixed = p.fixed * Math.pow(1 + sc.costInflation, yearIndex) * (1 + sc.fixedChange);
+      let subs = 0, fee = 0;
+      if (m < L) {
+        // pre-launch: paid pilots only (development products earn nothing yet)
+        subs = dev ? 0 : (p.betaCompanies ?? 0);
+        fee = dev ? 0 : (p.pilotFee ?? 0);
+      } else {
+        const since = m - L;            // 0 at launch month
+        const ramp = since + 1;         // reaches target at ramp = 12
+        const T = Math.max(0, p.subs);
+        subs = ramp <= 12 ? T * ramp / 12 : T * Math.pow(1 + sc.growthRate - sc.churnRate, ramp - 12);
+        subs *= (1 + sc.subChange);
+        fee = p.fee * Math.pow(1 + sc.annualPriceIncrease, Math.floor(since/12)) * (1 + sc.priceChange);
+      }
+      const revenue = fee * subs;
       const totalExpense = revenue * ((devPct+mktPct+reservePct)/100) + effectiveFixed;
-      const profit = revenue - totalExpense;
-      return { revenue, totalExpense, profit, subs: effectiveSubs };
+      return { revenue, totalExpense, profit: revenue - totalExpense, subs };
     });
     const revenue = monthRows.reduce((a,b)=>a+b.revenue,0);
     const totalExpense = monthRows.reduce((a,b)=>a+b.totalExpense,0);
     const profit = revenue - totalExpense;
     const subs = monthRows.reduce((a,b)=>a+b.subs,0);
     cumulative += profit;
-    out.push({ m, revenue, totalExpense, profit, cumulative, subs });
+    if (cumulative < trough) trough = cumulative;
+    if (breakevenMonth === null && profit >= 0) breakevenMonth = m;
+    if (cashPositiveMonth === null && cumulative >= 0) cashPositiveMonth = m;
+    out.push({ m, cal: calMonth(m), revenue, totalExpense, profit, cumulative, subs });
   }
+  out.meta = { peakFunding: -trough, breakevenMonth, cashPositiveMonth };
   return out;
 }
 
 function renderProjection() {
   const months = computeProjection(36);
-  const body = months.map(x => `<tr><td>Month ${x.m}</td><td>${num(x.subs)}</td><td>${money(x.revenue)}</td><td>${money(x.totalExpense)}</td><td class="${x.profit >= 0 ? 'positive' : 'negative'}"><strong>${money(x.profit)}</strong></td><td class="${x.cumulative >= 0 ? 'positive' : 'negative'}">${money(x.cumulative)}</td></tr>`).join('');
-  document.getElementById('projectionTable').innerHTML = `<thead><tr><th>Month</th><th>Subscriptions</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Cumulative Profit</th></tr></thead><tbody>${body}</tbody>`;
-  drawLineChart('projectionChart', months.map(x => `M${x.m}`), [months.map(x => x.revenue), months.map(x => x.profit)], ['Revenue', 'Profit']);
+  const meta = months.meta;
+  const beMonth = meta.breakevenMonth ? `M${meta.breakevenMonth} · ${calMonth(meta.breakevenMonth)}` : 'Beyond 36 mo';
+  const cpMonth = meta.cashPositiveMonth ? `M${meta.cashPositiveMonth} · ${calMonth(meta.cashPositiveMonth)}` : 'Beyond 36 mo';
+  const launches = [...new Set(products.map(p => Math.max(0, p.launchMonth ?? 6)))].sort((a,b)=>a-b);
+  const launchText = launches.map(L => calMonth(L)).join(' / ');
+
+  const summary = document.getElementById('projectionSummary');
+  if (summary) summary.innerHTML = `
+    <div class="scenario-box"><label>Paid Launch Window</label><div class="value" style="font-size:18px;">${launchText}</div><div class="explain">Beta-4 first, products in development later.</div></div>
+    <div class="scenario-box"><label>Monthly Break-even</label><div class="value" style="font-size:18px;">${beMonth}</div><div class="explain">First month total profit ≥ 0.</div></div>
+    <div class="scenario-box"><label>Peak Funding Need</label><div class="value negative" style="font-size:18px;">${money(meta.peakFunding)}</div><div class="explain">Max cumulative cash burned before turning positive — capital to budget.</div></div>
+    <div class="scenario-box"><label>Cash-flow Positive</label><div class="value" style="font-size:18px;">${cpMonth}</div><div class="explain">Cumulative profit recovers all prior burn.</div></div>`;
+
+  const body = months.map(x => `<tr><td>M${x.m} · ${x.cal}</td><td>${num(x.subs)}</td><td>${money(x.revenue)}</td><td>${money(x.totalExpense)}</td><td class="${x.profit >= 0 ? 'positive' : 'negative'}"><strong>${money(x.profit)}</strong></td><td class="${x.cumulative >= 0 ? 'positive' : 'negative'}">${money(x.cumulative)}</td></tr>`).join('');
+  document.getElementById('projectionTable').innerHTML = `<thead><tr><th>Month</th><th>Subscriptions</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Cumulative Cash</th></tr></thead><tbody>${body}</tbody>`;
+  const markers = launches.map(L => ({ i: L - 1, label: 'Launch ' + calMonth(L) }));
+  drawLineChart('projectionChart', months.map(x => `M${x.m}`), [months.map(x => x.revenue), months.map(x => x.profit)], ['Revenue', 'Profit'], { markers });
 }
 
 /* ---------------- Valuation ---------------- */
@@ -937,18 +1026,21 @@ function renderInvestment(rows) {
   const modelVal = t.valuation;
   const valGap = postMoney - modelVal;
 
-  // Runway
-  const monthlyProfit = t.profit;
+  // Runway — based on TODAY's real burn (pre-revenue) and the projected peak funding need
+  const proj = computeProjection(36);
+  const curBurn = totals(calcAll(getScenario(), 'current')).profit; // negative today
+  const peakFunding = proj.meta.peakFunding;
   let runwayLine;
-  if (monthlyProfit >= 0) {
-    runwayLine = `The portfolio is currently <strong class="positive">cash-generating</strong> at ${money(monthlyProfit)}/mo, so the raise extends growth rather than covering a burn.`;
+  if (curBurn >= 0) {
+    runwayLine = `The portfolio is currently <strong class="positive">cash-generating</strong> at ${money(curBurn)}/mo, so the raise funds growth rather than burn.`;
   } else {
-    const runwayMonths = amount / Math.abs(monthlyProfit);
-    runwayLine = `At the current monthly burn of <strong class="negative">${money(Math.abs(monthlyProfit))}</strong>, this raise gives roughly <strong>${num(runwayMonths)} months</strong> of runway (before growth/cost changes).`;
+    const runwayMonths = amount / Math.abs(curBurn);
+    const covers = amount >= peakFunding;
+    runwayLine = `Today's pre-revenue burn is <strong class="negative">${money(Math.abs(curBurn))}/mo</strong> → this raise covers roughly <strong>${num(runwayMonths)} months</strong> at the current rate. The model's projected <strong>peak funding need</strong> (deepest cumulative burn before turning cash-positive) is <strong class="negative">${money(peakFunding)}</strong> — this raise is <strong class="${covers?'positive':'negative'}">${covers?'sufficient':'short of'}</strong> that peak.`;
   }
 
-  // Projected exit
-  const projMonth = computeProjection(years*12).slice(-1)[0];
+  // Projected exit (uses the ramped projection, so exit ARR reflects the launch curve)
+  const projMonth = proj.slice(0, years*12).slice(-1)[0];
   const exitArr = projMonth ? projMonth.revenue * 12 : t.arr;
   const exitValuation = exitArr * exitMult;
   const investorStakeExit = exitValuation * equity;
@@ -975,14 +1067,15 @@ function renderInvestment(rows) {
   let emi, totalPay, totalInterest;
   if (r === 0) { emi = P / n; } else { emi = P * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1); }
   totalPay = emi * n; totalInterest = totalPay - P;
-  const affordClass = monthlyProfit >= emi ? 'positive' : 'negative';
+  const targetProfit = t.profit; // monthly profit at target run-rate
+  const affordClass = targetProfit >= emi ? 'positive' : 'negative';
   document.getElementById('emiOutput').innerHTML = `
     <strong>Reducing-balance EMI</strong><br>
     Monthly EMI: <strong>${money(emi)}</strong> for ${num(n)} months.<br>
     Total repayment: <strong>${money(totalPay)}</strong> &nbsp;|&nbsp; Total interest: <strong class="negative">${money(totalInterest)}</strong>.<br><br>
-    Current monthly profit is ${money(monthlyProfit)} — the EMI is
-    <strong class="${affordClass}">${monthlyProfit >= emi ? 'covered by current profit' : 'NOT covered by current profit'}</strong>.<br>
-    <span style="color:var(--muted);">Debt keeps 100% equity but adds a fixed obligation; equity adds no repayment but dilutes ownership by ${pct(equity*100)}.</span>`;
+    <strong>Caution (pre-revenue):</strong> today you are burning cash, so debt EMIs would start before revenue does. At the <em>target</em> run-rate, monthly profit is ${money(targetProfit)} — the EMI would then be
+    <strong class="${affordClass}">${targetProfit >= emi ? 'comfortably covered' : 'NOT covered'}</strong>.<br>
+    <span style="color:var(--muted);">Debt keeps 100% equity but adds a fixed obligation during the burn phase; equity adds no repayment but dilutes ownership by ${pct(equity*100)}.</span>`;
 
   // Return sensitivity table
   const mults = [3,4,5,6,7,8,10];
@@ -1014,10 +1107,11 @@ function updateLabels() {
 
 function renderAll() {
   updateLabels();
-  const rows = calcAll();
-  renderKpis(rows);
-  renderSnapshot(rows);
-  renderProductCards(rows);
+  const rows = calcAll();                       // target / plan basis for most tabs
+  const dashRows = calcAll(getScenario(), viewMode); // dashboard honours the toggle
+  renderKpis(dashRows);
+  renderSnapshot(dashRows);
+  renderProductCards(dashRows);
   renderEditableTable();
   renderTargetOutput();
   renderUnit(rows);
@@ -1025,10 +1119,17 @@ function renderAll() {
   renderProjection();
   renderValuation(rows);
   renderInvestment(rows);
-  drawBarChart('revenueChart', rows.map(r => r.name), rows.map(r => r.revenue), 'Monthly Revenue');
-  drawBarChart('profitChart', rows.map(r => r.name), rows.map(r => r.profit), 'Monthly Profit');
+  drawBarChart('revenueChart', dashRows.map(r => r.name), dashRows.map(r => r.revenue), 'Monthly Revenue');
+  drawBarChart('profitChart', dashRows.map(r => r.name), dashRows.map(r => r.profit), 'Monthly Profit');
   drawBarChart('valuationChart', rows.map(r => r.name), rows.map(r => r.valuation), 'Indicative Valuation');
   localStorage.setItem('rexoInvestorProducts', JSON.stringify(products));
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('tgCurrent')?.classList.toggle('active', mode === 'current');
+  document.getElementById('tgTarget')?.classList.toggle('active', mode === 'target');
+  renderAll();
 }
 
 function showView(id) {
@@ -1045,7 +1146,7 @@ function updateProduct(i, key, value, soft=false) {
   renderAll();
 }
 function addProduct() {
-  products.push({ name: 'New Product', desc: 'New software product revenue model.', fee: 999, subs: 10, recurring: 80, dev: 20, mkt: 20, fixed: 50000, churn: 2.5, cac: 1500 });
+  products.push({ name: 'New Product', desc: 'New software product revenue model.', fee: 999, subs: 10, recurring: 80, dev: 20, mkt: 20, fixed: 50000, churn: 2.5, cac: 1500, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 6 });
   renderAll();
 }
 function removeProduct(i) { products.splice(i, 1); renderAll(); }
@@ -1114,7 +1215,7 @@ function importModel(event) {
       const data = JSON.parse(e.target.result);
       const arr = Array.isArray(data) ? data : data.products;
       if (!Array.isArray(arr) || !arr.length) throw new Error('No products array found.');
-      products = arr.map(p => ({ name:'', desc:'', fee:0, subs:0, recurring:80, dev:20, mkt:20, fixed:0, churn:2, cac:0, ...p }));
+      products = arr.map(p => ({ name:'', desc:'', fee:0, subs:0, recurring:80, dev:20, mkt:20, fixed:0, ...PRODUCT_DEFAULTS, ...p }));
       renderAll();
       alert('Model imported successfully.');
     } catch (err) { alert('Could not import file: ' + err.message); }
@@ -1298,6 +1399,21 @@ function drawLineChart(id, labels, series, names, opts = {}) {
     ctx.fillStyle = '#fff'; ctx.strokeStyle = stroke; ctx.lineWidth = 2.4;
     ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   });
+  // launch markers (vertical dashed lines)
+  if (opts.markers && opts.markers.length) {
+    ctx.save();
+    opts.markers.forEach(mk => {
+      if (mk.i < 0 || mk.i >= series[0].length) return;
+      const x = xAt(mk.i);
+      ctx.strokeStyle = '#94A0B0'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(x, pad.t + 6); ctx.lineTo(x, pad.t + chartH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#475467'; ctx.font = '700 9.5px Inter, Segoe UI, Arial';
+      ctx.textAlign = x > w - 90 ? 'right' : 'left';
+      ctx.fillText(mk.label, x + (x > w - 90 ? -4 : 4), pad.t + 4);
+    });
+    ctx.restore();
+  }
   // legend
   ctx.font = '700 12px Inter, Segoe UI, Arial'; ctx.textAlign = 'left';
   let lx = pad.l;

@@ -8,6 +8,18 @@ Every number is a transparent, deterministic mathematical calculation from your 
 
 RexoBooks · RexoPayroll · RexoCompliance OS · PracticeDesk · RexoGST · Siteledge
 
+## Current stage (June 2026 — pre-revenue)
+
+This is built as a **pre-revenue planning + investor model**, not a revenue tracker:
+
+- **RexoBooks, RexoPayroll, PracticeDesk, Siteledge** — live in **paid beta with 5 pilot companies** total; paid sales begin **Dec 2026**.
+- **RexoGST, RexoCompliance OS** — **in development**; paid sales begin **Jun 2027**.
+- Subscriber numbers in the model are **targets at launch + 12 months**. The 36-month projection **ramps** each product from its launch month up to that target, so you see the realistic J-curve: today's burn → post-launch profit.
+
+A **Current ⇄ Target** toggle on the Executive Dashboard flips between today's paid-pilot reality (revenue + burn) and the target plan. Edit the stage, beta-pilot count, pilot fee and launch month per product in the **Product Model** tab. *(Pilot fees default to ~50% of list price — adjust to your actuals.)*
+
+The **36-Month Projection** tab surfaces the three numbers investors ask first: **paid launch window**, **monthly break-even month**, and **peak funding need** (the deepest cumulative cash burn before turning positive — the capital to budget/raise).
+
 ## What it does
 
 | Tab | Purpose |
