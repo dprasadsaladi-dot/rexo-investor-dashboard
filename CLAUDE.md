@@ -63,6 +63,18 @@ To publish any change:
 
 Note: the repo is **public** — source and figures are visible to anyone with the link.
 
+## Helper scripts (Windows, double-click)
+- `open-dashboard.cmd` — open the local `index.html` in the default browser.
+- `open-live.cmd` — open the live GitHub Pages site.
+- `publish.cmd` — commit + push (prompts for a change description); live in ~1-2 min.
+
+## Resuming a session later
+Sessions are saved automatically. To continue a previous conversation:
+1. Open a terminal and `cd C:\Regent-Tech-Repository\Invest` (must be this folder).
+2. Run `claude --continue` (or `claude -c`) for the most recent session, or
+   `claude --resume` (`claude -r`) to pick from a list. Inside a session, `/resume` also works.
+All work is committed to git regardless, and this CLAUDE.md brings a fresh session up to speed.
+
 ## Conventions
 - Keep it a single file with no external dependencies (offline-first is a core feature).
 - Match the surrounding code style; charts are custom canvas code — reuse existing helpers.
