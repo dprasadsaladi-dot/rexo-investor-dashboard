@@ -186,6 +186,13 @@
     .break-cell strong { display: block; margin-top: 6px; color: var(--navy); font-size: 20px; }
 
     .footer-note { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+    .glossary { margin-top: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+    .glossary h3 { margin: 0 0 4px; font-size: 15px; font-weight: 850; color: var(--text); }
+    .glossary .gloss-sub { margin: 0 0 6px; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .gloss-cat { margin: 18px 0 8px; font-size: 11px; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+    .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 11px 28px; }
+    .glossary-grid div { font-size: 12.5px; line-height: 1.5; color: var(--text); }
+    .glossary-grid b { color: var(--blue); font-weight: 850; }
     .notice { border: 1px solid #F1D59E; background: #FFF8E8; color: #6B4B09; padding: 13px 14px; border-radius: 14px; font-size: 13px; line-height: 1.45; margin-bottom: 18px; }
 
     .positive { color: var(--green) !important; }
@@ -526,8 +533,52 @@
       </div>
     </section>
 
+    <div class="glossary">
+      <h3>* Glossary of Terms &amp; Abbreviations</h3>
+      <p class="gloss-sub">Plain-language definitions of the financial and SaaS terms used throughout this dashboard.</p>
+
+      <div class="gloss-cat">Unit Economics &amp; Revenue</div>
+      <div class="glossary-grid">
+        <div><b>ARR</b> — Annual Recurring Revenue: yearly value of recurring subscriptions (monthly recurring revenue × 12).</div>
+        <div><b>MRR</b> — Monthly Recurring Revenue: subscription revenue earned in a month (fee × subscribers).</div>
+        <div><b>ARPU</b> — Average Revenue Per User: average monthly revenue earned per subscriber.</div>
+        <div><b>LTV</b> — Lifetime Value: total gross-margin revenue a customer generates over their lifetime.</div>
+        <div><b>CAC</b> — Customer Acquisition Cost: average spend to acquire one paying customer.</div>
+        <div><b>LTV:CAC</b> — Ratio of lifetime value to acquisition cost. ≥ 3× is healthy; &lt; 1× loses money per customer.</div>
+        <div><b>CAC Payback</b> — Months of gross margin needed to recover the CAC of a customer (≤ 12 months is good for SMB SaaS).</div>
+        <div><b>Churn</b> — Percentage of subscribers who cancel each month.</div>
+        <div><b>Gross Margin</b> — Share of revenue left after variable costs (dev/infra + marketing/support).</div>
+        <div><b>Contribution / Subscriber</b> — Fee remaining per subscriber after variable cost %; funds fixed costs and profit.</div>
+        <div><b>Break-even Subscribers</b> — Subscribers required for revenue to cover all costs (zero profit/loss).</div>
+      </div>
+
+      <div class="gloss-cat">Valuation &amp; Investment</div>
+      <div class="glossary-grid">
+        <div><b>MOIC</b> — Multiple On Invested Capital: how many times an investor's money grows (exit value ÷ investment).</div>
+        <div><b>IRR</b> — Internal Rate of Return: the annualised (per-year) return rate on an investment.</div>
+        <div><b>EMI</b> — Equated Monthly Installment: fixed monthly repayment on a reducing-balance loan.</div>
+        <div><b>ARR Multiple</b> — Valuation expressed as a multiple of ARR (e.g. 4× ARR).</div>
+        <div><b>Pre-money / Post-money</b> — Company valuation before / after a fundraise (post-money = pre-money + amount raised).</div>
+        <div><b>Dilution</b> — Percentage of ownership given to new investors in a round.</div>
+        <div><b>Runway</b> — Number of months the business can operate on the cash it holds.</div>
+        <div><b>Peak Funding Need</b> — Deepest cumulative cash burned before the business turns cash-positive — the capital to budget/raise.</div>
+        <div><b>p.a.</b> — Per annum (per year).</div>
+      </div>
+
+      <div class="gloss-cat">General &amp; Industry</div>
+      <div class="glossary-grid">
+        <div><b>KPI</b> — Key Performance Indicator: a headline metric used to track business health.</div>
+        <div><b>SaaS</b> — Software as a Service: software sold on a recurring subscription.</div>
+        <div><b>SMB</b> — Small &amp; Medium Business.</div>
+        <div><b>MSME</b> — Micro, Small &amp; Medium Enterprises.</div>
+        <div><b>MIS</b> — Management Information System: reports/data used for business decisions.</div>
+        <div><b>GST</b> — Goods &amp; Services Tax (India).</div>
+        <div><b>CA / CS</b> — Chartered Accountant / Company Secretary.</div>
+      </div>
+    </div>
+
     <div class="footer-note">
-      Investor model for RexoBooks, RexoPayroll, RexoCompliance OS, PracticeDesk, RexoGST and Siteledge. All figures are deterministic calculations from your inputs — replace sample numbers with validated actuals before formal circulation.
+      Investor model for RexoBooks, RexoPayroll, RexoCompliance OS, PracticeDesk, RexoGST and Siteledge. All figures are deterministic calculations from your inputs — replace sample numbers with validated actuals before formal circulation. <strong>* See the glossary above for all term definitions.</strong>
     </div>
   </main>
 </div>
