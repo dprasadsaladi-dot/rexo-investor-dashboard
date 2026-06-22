@@ -513,8 +513,8 @@
         <div class="card">
           <div class="section-title"><div><h2>Equity Round &amp; Investor Return</h2><p>Enter the raise. The model derives implied valuation, dilution, runway and projected investor return (MOIC &amp; IRR).</p></div></div>
           <div class="scenario-grid">
-            <div class="scenario-box"><label>Investment Amount (₹)</label><input id="investAmount" type="number" value="15000000" step="500000" oninput="renderAll()" /></div>
-            <div class="scenario-box"><label>Equity Offered (%)</label><input id="investEquity" type="number" value="20" step="0.5" min="0.1" max="100" oninput="renderAll()" /></div>
+            <div class="scenario-box"><label>Investment Amount (₹)</label><input id="investAmount" type="number" value="20000000" step="500000" oninput="renderAll()" /></div>
+            <div class="scenario-box"><label>Equity Offered (%)</label><input id="investEquity" type="number" value="25" step="0.5" min="0.1" max="100" oninput="renderAll()" /></div>
             <div class="scenario-box"><label>Exit Horizon (years)</label><input id="exitYears" type="number" value="5" step="1" min="1" max="7" oninput="renderAll()" /></div>
             <div class="scenario-box"><label>Exit Valuation Multiple (× ARR)</label><input id="exitMultiple" type="number" value="5" step="0.5" min="1" oninput="renderAll()" /></div>
           </div>
@@ -605,12 +605,12 @@
 //  betaCompanies = current paying pilots, pilotFee = current monthly fee per pilot (discounted)
 //  subs = TARGET paying subscribers at launch + 12 months, launchMonth = months from now (Jun 2026)
 const sampleProducts = [
-  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 1000, recurring: 86, dev: 22, mkt: 18, fixed: 120000, churn: 2.0, cac: 2500, status: 'Beta', betaCompanies: 10, pilotFee: 833, launchMonth: 6, roadmap: [{m:0,s:10},{m:6,s:100},{m:18,s:250},{m:30,s:500},{m:42,s:1000},{m:54,s:1400},{m:66,s:1820}] },
-  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 1000, recurring: 88, dev: 18, mkt: 18, fixed: 80000, churn: 2.5, cac: 1800, status: 'Beta', betaCompanies: 5, pilotFee: 0, launchMonth: 6, roadmap: [{m:0,s:5},{m:6,s:20},{m:18,s:100},{m:30,s:400},{m:42,s:1000},{m:54,s:1400},{m:66,s:1820}] },
-  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 200, recurring: 82, dev: 20, mkt: 20, fixed: 95000, churn: 2.0, cac: 4000, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12, roadmap: [{m:0,s:0},{m:6,s:0},{m:18,s:5},{m:30,s:50},{m:42,s:200},{m:54,s:280},{m:66,s:364}] },
-  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 500, recurring: 84, dev: 16, mkt: 18, fixed: 60000, churn: 3.0, cac: 1200, status: 'Beta', betaCompanies: 1, pilotFee: 0, launchMonth: 6, roadmap: [{m:0,s:1},{m:6,s:5},{m:18,s:100},{m:30,s:200},{m:42,s:500},{m:54,s:700},{m:66,s:910}] },
-  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 200, recurring: 85, dev: 22, mkt: 18, fixed: 100000, churn: 2.5, cac: 2200, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12, roadmap: [{m:0,s:0},{m:6,s:0},{m:18,s:5},{m:30,s:50},{m:42,s:200},{m:54,s:280},{m:66,s:364}] },
-  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 100, recurring: 80, dev: 25, mkt: 20, fixed: 160000, churn: 1.5, cac: 12000, status: 'Beta', betaCompanies: 1, pilotFee: 4167, launchMonth: 6, roadmap: [{m:0,s:1},{m:6,s:5},{m:18,s:20},{m:30,s:50},{m:42,s:100},{m:54,s:140},{m:66,s:182}] }
+  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 1000, recurring: 86, dev: 22, mkt: 18, fixed: 200000, churn: 2.0, cac: 2500, status: 'Beta', betaCompanies: 10, pilotFee: 833, launchMonth: 6, roadmap: [{m:0,s:10},{m:6,s:100},{m:18,s:250},{m:30,s:500},{m:42,s:1000},{m:54,s:1400},{m:66,s:1820}] },
+  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 1000, recurring: 88, dev: 18, mkt: 18, fixed: 140000, churn: 2.5, cac: 1800, status: 'Beta', betaCompanies: 5, pilotFee: 0, launchMonth: 6, roadmap: [{m:0,s:5},{m:6,s:20},{m:18,s:100},{m:30,s:400},{m:42,s:1000},{m:54,s:1400},{m:66,s:1820}] },
+  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 200, recurring: 82, dev: 20, mkt: 20, fixed: 120000, churn: 2.0, cac: 4000, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12, roadmap: [{m:0,s:0},{m:6,s:0},{m:18,s:5},{m:30,s:50},{m:42,s:200},{m:54,s:280},{m:66,s:364}] },
+  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 500, recurring: 84, dev: 16, mkt: 18, fixed: 100000, churn: 3.0, cac: 1200, status: 'Beta', betaCompanies: 1, pilotFee: 0, launchMonth: 6, roadmap: [{m:0,s:1},{m:6,s:5},{m:18,s:100},{m:30,s:200},{m:42,s:500},{m:54,s:700},{m:66,s:910}] },
+  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 200, recurring: 85, dev: 22, mkt: 18, fixed: 110000, churn: 2.5, cac: 2200, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12, roadmap: [{m:0,s:0},{m:6,s:0},{m:18,s:5},{m:30,s:50},{m:42,s:200},{m:54,s:280},{m:66,s:364}] },
+  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 100, recurring: 80, dev: 25, mkt: 20, fixed: 190000, churn: 1.5, cac: 12000, status: 'Beta', betaCompanies: 1, pilotFee: 4167, launchMonth: 6, roadmap: [{m:0,s:1},{m:6,s:5},{m:18,s:20},{m:30,s:50},{m:42,s:100},{m:54,s:140},{m:66,s:182}] }
 ];
 
 const NUMERIC_KEYS = ['fee','subs','recurring','dev','mkt','fixed','churn','cac','betaCompanies','pilotFee','launchMonth'];
@@ -933,15 +933,20 @@ function setSavedScenarios(list) { localStorage.setItem('rexoScenarios', JSON.st
 // Ship starter scenarios so a fresh visitor sees Base vs Conservative side-by-side.
 // Only seeds when the browser has none saved — never overwrites a user's own scenarios.
 function seedDefaultScenarios() {
-  if (getSavedScenarios().length) return;
   const base = {};
   CONTROL_IDS.forEach(id => base[id] = val(id));            // current shipped defaults (conservative)
-  const conservative = { ...base };                          // 3x ARR / 6x profit
-  const baseCase = { ...base, arrMultiple: 4, profitMultiple: 8 }; // optimistic multiples
-  setSavedScenarios([
-    { name: 'Base Case', controls: baseCase, products: structuredClone(sampleProducts) },
-    { name: 'Conservative', controls: conservative, products: structuredClone(sampleProducts) },
-  ]);
+  // Stress products: double churn and CAC to also stress the unit economics if loaded.
+  const stressProducts = structuredClone(sampleProducts).map(p => ({ ...p, churn: (p.churn || 2) * 2, cac: (p.cac || 0) * 2 }));
+  const defaults = [
+    { name: 'Base Case', controls: { ...base, arrMultiple: 4, profitMultiple: 8 }, products: structuredClone(sampleProducts) },
+    { name: 'Conservative', controls: { ...base }, products: structuredClone(sampleProducts) },
+    // Downside: 30% fewer subs, +6pts variable cost, +20% fixed, 8% reserve, harsh 2.5x/5x multiples.
+    { name: 'Stress (Downside)', controls: { ...base, subChange: -30, devChange: 3, mktChange: 3, fixedChange: 20, lossReserve: 8, arrMultiple: 2.5, profitMultiple: 5 }, products: stressProducts },
+  ];
+  const list = getSavedScenarios();
+  let changed = false;
+  defaults.forEach(d => { if (!list.some(s => s.name === d.name)) { list.push(d); changed = true; } });
+  if (changed) setSavedScenarios(list);
 }
 
 function saveNamedScenario() {
