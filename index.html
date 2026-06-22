@@ -285,7 +285,7 @@
       <div>
         <div class="brand-badge"><span class="logo-mark">R</span><span>Rexo Software Products</span></div>
         <h1>Investor Revenue, Unit-Economics &amp; Valuation Dashboard</h1>
-        <p class="subtitle">A live, rule-based decision model for product-wise subscription revenue, cost control, break-even, LTV/CAC unit economics, pricing sensitivity, 36-month projections, valuation and investment-return scenarios. No AI estimation — every number is a transparent mathematical calculation you can audit.</p>
+        <p class="subtitle">A live, rule-based decision model for product-wise subscription revenue, cost control, break-even, LTV/CAC unit economics, pricing sensitivity, 48-month projections, valuation and investment-return scenarios. No AI estimation — every number is a transparent mathematical calculation you can audit.</p>
         <div class="hero-actions">
           <button class="primary" onclick="showView('dashboard')">Open Dashboard</button>
           <button class="secondary" onclick="window.print()">Print / Save as PDF</button>
@@ -308,7 +308,7 @@
       <button class="tab" data-view="model" onclick="showView('model')">Product Model</button>
       <button class="tab" data-view="unit" onclick="showView('unit')">Unit Economics</button>
       <button class="tab" data-view="scenario" onclick="showView('scenario')">Scenario Lab</button>
-      <button class="tab" data-view="projection" onclick="showView('projection')">36-Month Projection</button>
+      <button class="tab" data-view="projection" onclick="showView('projection')">48-Month Projection</button>
       <button class="tab" data-view="valuation" onclick="showView('valuation')">Valuation</button>
       <button class="tab" data-view="invest" onclick="showView('invest')">Investment &amp; Returns</button>
     </nav>
@@ -458,14 +458,14 @@
     <section id="projection" class="view hidden">
       <div class="grid two">
         <div class="card">
-          <div class="section-title"><div><h2>36-Month Projection Controls</h2><p>Monthly growth, churn, annual price increase and cost inflation assumptions (applied on top of the current model &amp; scenario).</p></div></div>
+          <div class="section-title"><div><h2>48-Month Projection Controls</h2><p>Monthly growth, churn, annual price increase and cost inflation assumptions (applied on top of the current model &amp; scenario).</p></div></div>
           <div class="slider-row"><div><div class="slider-label"><strong>Monthly New Subscription Growth</strong><span id="growthLabel"></span></div><input id="growthRate" type="range" min="0" max="20" value="5" step=".5" oninput="renderAll()" /></div><input type="number" id="growthRateNum" step=".5" onchange="syncRange('growthRate', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>Monthly Churn (portfolio)</strong><span id="churnLabel"></span></div><input id="churnRate" type="range" min="0" max="15" value="2" step=".5" oninput="renderAll()" /></div><input type="number" id="churnRateNum" step=".5" onchange="syncRange('churnRate', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>Annual Price Increase</strong><span id="annualPriceLabel"></span></div><input id="annualPriceIncrease" type="range" min="0" max="50" value="10" step="1" oninput="renderAll()" /></div><input type="number" id="annualPriceIncreaseNum" onchange="syncRange('annualPriceIncrease', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>Annual Fixed Cost Inflation</strong><span id="costInflationLabel"></span></div><input id="costInflation" type="range" min="0" max="40" value="8" step="1" oninput="renderAll()" /></div><input type="number" id="costInflationNum" onchange="syncRange('costInflation', this.value)" /></div>
         </div>
         <div class="card chart-card">
-          <div class="section-title"><div><h2>Projection Trend</h2><p>Monthly revenue and profit trend over 36 months.</p></div></div>
+          <div class="section-title"><div><h2>Projection Trend</h2><p>Monthly revenue and profit trend over 48 months.</p></div></div>
           <div class="chart-wrap"><canvas id="projectionChart"></canvas></div>
         </div>
       </div>
@@ -476,7 +476,7 @@
       </div>
 
       <div class="card" style="margin-top:18px;">
-        <div class="section-title"><div><h2>36-Month Projection Table</h2><p>Month-wise consolidated revenue, expenses, profit and cumulative cash (the J-curve from pilot burn to post-launch profit).</p></div></div>
+        <div class="section-title"><div><h2>48-Month Projection Table</h2><p>Month-wise consolidated revenue, expenses, profit and cumulative cash (the J-curve from pilot burn to post-launch profit).</p></div></div>
         <div class="table-wrap"><table id="projectionTable"></table></div>
       </div>
     </section>
@@ -1018,7 +1018,7 @@ function renderScenarioCompare() {
 // Realistic ramp: pre-launch = paid pilots only (dev products = nothing) but fixed cost
 // (the team) is being spent from day one. After launch, subscribers ramp linearly to the
 // target over 12 months, then grow at (growth - churn). Fixed cost inflates annually.
-function computeProjection(monthsCount = 36) {
+function computeProjection(monthsCount = 48) {
   const sc = getScenario();
   let out = [];
   let cumulative = 0, trough = 0, breakevenMonth = null, cashPositiveMonth = null;
@@ -1074,10 +1074,10 @@ function computeProjection(monthsCount = 36) {
 }
 
 function renderProjection() {
-  const months = computeProjection(36);
+  const months = computeProjection(48);
   const meta = months.meta;
-  const beMonth = meta.breakevenMonth ? `M${meta.breakevenMonth} · ${calMonth(meta.breakevenMonth)}` : 'Beyond 36 mo';
-  const cpMonth = meta.cashPositiveMonth ? `M${meta.cashPositiveMonth} · ${calMonth(meta.cashPositiveMonth)}` : 'Beyond 36 mo';
+  const beMonth = meta.breakevenMonth ? `M${meta.breakevenMonth} · ${calMonth(meta.breakevenMonth)}` : 'Beyond 48 mo';
+  const cpMonth = meta.cashPositiveMonth ? `M${meta.cashPositiveMonth} · ${calMonth(meta.cashPositiveMonth)}` : 'Beyond 48 mo';
   const launches = [...new Set(products.map(p => Math.max(0, p.launchMonth ?? 6)))].sort((a,b)=>a-b);
   const launchText = launches.map(L => calMonth(L)).join(' / ');
 
@@ -1123,7 +1123,7 @@ function renderInvestment(rows) {
   const valGap = postMoney - modelVal;
 
   // Runway — based on TODAY's real burn (pre-revenue) and the projected peak funding need
-  const proj = computeProjection(36);
+  const proj = computeProjection(48);
   const curBurn = totals(calcAll(getScenario(), 'current')).profit; // negative today
   const peakFunding = proj.meta.peakFunding;
   let runwayLine;

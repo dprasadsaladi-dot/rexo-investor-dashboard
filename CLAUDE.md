@@ -32,7 +32,7 @@ RexoBooks · RexoPayroll · RexoCompliance OS · PracticeDesk · RexoGST · Site
   - `launchMonth` = months from now (Jun 2026).
   - `roadmap` = year-end subscriber milestones `[{m,s}...]` at months 0/6/18/30/42
     (Jun '26 / Dec '26 / '27 / '28 / '29). `computeProjection()` interpolates between
-    them via `roadmapSubs()` so the 36-month curve follows the real 3-year plan instead
+    them via `roadmapSubs()` so the 48-month curve follows the real 3-year plan instead
     of a 12-month ramp. `subs` (the mature target, = the Dec '29 milestone) still drives
     Valuation / Unit Econ / KPIs. Products without a roadmap fall back to the old ramp.
 - `NUMERIC_KEYS` (~line 560) lists the editable numeric fields.
@@ -41,7 +41,7 @@ RexoBooks · RexoPayroll · RexoCompliance OS · PracticeDesk · RexoGST · Site
 
 ## Key behaviour to remember
 - **Everything is derived.** Changing a product's inputs (e.g. `subs`) auto-recomputes
-  revenue, profit, ARR, margin, LTV/CAC, valuation, 36-month projection, break-even,
+  revenue, profit, ARR, margin, LTV/CAC, valuation, 48-month projection, break-even,
   peak funding need, and investor returns. Usually you only edit `sampleProducts`.
 - **"Target Subscribers" KPI = sum of all products' `subs`.** (Currently 3000 — the
   mature 2029 target from the 3-year plan: Books 1000, Payroll 1000, PracticeDesk 500,
