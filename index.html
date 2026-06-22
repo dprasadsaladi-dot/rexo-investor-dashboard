@@ -193,6 +193,11 @@
     .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 11px 28px; }
     .glossary-grid div { font-size: 12.5px; line-height: 1.5; color: var(--text); }
     .glossary-grid b { color: var(--blue); font-weight: 850; }
+    .has-tip { cursor: help; text-decoration: underline dotted; text-decoration-color: rgba(107,114,128,.5); text-underline-offset: 3px; }
+    #glossTip { position: fixed; z-index: 9999; max-width: 260px; background: #172033; color: #fff; font-size: 12px; line-height: 1.45; font-weight: 500; padding: 9px 12px; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,.28); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .12s ease, transform .12s ease; }
+    #glossTip.show { opacity: 1; transform: translateY(0); }
+    #glossTip b { color: var(--gold-2); display: block; margin-bottom: 3px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+    @media print { #glossTip { display: none !important; } .has-tip { text-decoration: none; } }
     .notice { border: 1px solid #F1D59E; background: #FFF8E8; color: #6B4B09; padding: 13px 14px; border-radius: 14px; font-size: 13px; line-height: 1.45; margin-bottom: 18px; }
 
     .positive { color: var(--green) !important; }
@@ -1174,6 +1179,7 @@ function renderAll() {
   drawBarChart('profitChart', dashRows.map(r => r.name), dashRows.map(r => r.profit), 'Monthly Profit');
   drawBarChart('valuationChart', rows.map(r => r.name), rows.map(r => r.valuation), 'Indicative Valuation');
   localStorage.setItem('rexoInvestorProducts', JSON.stringify(products));
+  decorateTooltips();
 }
 
 function setViewMode(mode) {
@@ -1485,8 +1491,76 @@ function formatCompact(v) {
   return sign + '₹' + Math.round(n);
 }
 
+// ---- Hover tooltips for key metrics (definitions mirror the glossary) ----
+const GLOSSARY_DEFS = {
+  'LTV:CAC': 'Lifetime Value to Customer Acquisition Cost ratio. 3× or higher is healthy; below 1× loses money per customer.',
+  'CAC Payback': 'Months of gross margin needed to recover a customer’s acquisition cost. ≤ 12 months is good for SMB SaaS.',
+  'ARPU': 'Average Revenue Per User — average monthly revenue earned per subscriber.',
+  'ARR': 'Annual Recurring Revenue — yearly value of recurring subscriptions (monthly recurring revenue × 12).',
+  'MRR': 'Monthly Recurring Revenue — subscription revenue earned in a month.',
+  'LTV': 'Lifetime Value — total gross-margin revenue a customer generates over their lifetime.',
+  'CAC': 'Customer Acquisition Cost — average spend to acquire one paying customer.',
+  'MOIC': 'Multiple On Invested Capital — how many times an investor’s money grows (exit value ÷ investment).',
+  'IRR': 'Internal Rate of Return — the annualised (per-year) return rate on an investment.',
+  'EMI': 'Equated Monthly Installment — fixed monthly repayment on a reducing-balance loan.',
+  'Contribution': 'Fee remaining per subscriber after variable costs; funds fixed costs and profit.',
+  'Break-even': 'The subscriber count (or price) at which revenue exactly covers all costs.',
+  'Lifetime': 'Average number of months a customer stays subscribed (1 ÷ monthly churn).',
+  'Payback': 'Months of gross margin needed to recover a customer’s acquisition cost.',
+  'Valuation': 'Indicative company value derived from ARR and profit multiples.',
+  'Recurring': 'Share of revenue that recurs each period (vs one-time).',
+  'Runway': 'Number of months the business can operate on the cash it holds.',
+  'Dilution': 'Percentage of ownership given to new investors in a round.',
+  'Churn': 'Percentage of subscribers who cancel each month.',
+  'Margin': 'Gross margin — share of revenue left after variable (dev/infra + marketing/support) costs.'
+};
+const TIP_KEYS = Object.keys(GLOSSARY_DEFS).sort((a, b) => b.length - a.length);
+
+function decorateTooltips() {
+  const els = document.querySelectorAll('.kpi-label, .metric-box label, .scenario-box label, .break-cell label, table th');
+  els.forEach(el => {
+    const norm = el.textContent.replace(/\s*:\s*/g, ':').toUpperCase();
+    for (const k of TIP_KEYS) {
+      if (norm.includes(k.toUpperCase())) {
+        el.classList.add('has-tip');
+        el.setAttribute('data-term', k);
+        el.setAttribute('data-tip', GLOSSARY_DEFS[k]);
+        break;
+      }
+    }
+  });
+}
+
+function initTooltips() {
+  let tip = document.getElementById('glossTip');
+  if (!tip) { tip = document.createElement('div'); tip.id = 'glossTip'; document.body.appendChild(tip); }
+  const place = (e) => {
+    const pad = 12, r = tip.getBoundingClientRect();
+    let x = e.clientX + 14, y = e.clientY + 18;
+    if (x + r.width + pad > window.innerWidth) x = e.clientX - r.width - 14;
+    if (y + r.height + pad > window.innerHeight) y = e.clientY - r.height - 14;
+    tip.style.left = Math.max(pad, x) + 'px';
+    tip.style.top = Math.max(pad, y) + 'px';
+  };
+  document.addEventListener('mouseover', e => {
+    const t = e.target.closest('[data-tip]');
+    if (!t) return;
+    tip.innerHTML = (t.dataset.term ? '<b>' + t.dataset.term + '</b>' : '') + t.dataset.tip;
+    tip.classList.add('show');
+    place(e);
+  });
+  document.addEventListener('mousemove', e => { if (tip.classList.contains('show')) place(e); });
+  document.addEventListener('mouseout', e => {
+    const t = e.target.closest('[data-tip]');
+    if (!t) return;
+    if (e.relatedTarget && t.contains(e.relatedTarget)) return;
+    tip.classList.remove('show');
+  });
+}
+
 window.addEventListener('resize', () => setTimeout(renderAll, 120));
 window.addEventListener('click', e => { if (e.target.id === 'breakModal') closeBreakEven(); });
+initTooltips();
 renderAll();
 </script>
 </body>
