@@ -19,5 +19,8 @@ INVESTOR_QA_INTERNAL.html
 # Personal plain-English numbers guide (keep local; not for the public repo)
 REXO_NUMBERS_GUIDE.html
 
-# Investor leave-behind one-pager (keep local; share the exported PDF directly)
+# Investor leave-behind one-pager (keep local; share the exported PDF/image directly)
 REXO_INVESTOR_ONEPAGER.html
+REXO_INVESTOR_ONEPAGER.pdf
+REXO_INVESTOR_ONEPAGER.png
+_onepager_img.html
