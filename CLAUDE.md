@@ -30,6 +30,11 @@ RexoBooks · RexoPayroll · RexoCompliance OS · PracticeDesk · RexoGST · Site
   - `subs` = TARGET paying subscribers at launch + 12 months.
   - `betaCompanies` / `pilotFee` = today's paid-pilot reality (Current view).
   - `launchMonth` = months from now (Jun 2026).
+  - `roadmap` = year-end subscriber milestones `[{m,s}...]` at months 0/6/18/30/42
+    (Jun '26 / Dec '26 / '27 / '28 / '29). `computeProjection()` interpolates between
+    them via `roadmapSubs()` so the 36-month curve follows the real 3-year plan instead
+    of a 12-month ramp. `subs` (the mature target, = the Dec '29 milestone) still drives
+    Valuation / Unit Econ / KPIs. Products without a roadmap fall back to the old ramp.
 - `NUMERIC_KEYS` (~line 560) lists the editable numeric fields.
 - Core math: `computeProduct()` (~line 620) and the portfolio totals reducer (~line 663);
   projection logic in `computeProjection()` (~line 940).
