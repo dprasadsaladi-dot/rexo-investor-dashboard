@@ -489,10 +489,11 @@
           <div class="slider-row"><div><div class="slider-label"><strong>ARR Revenue Multiple</strong><span id="arrMultipleLabel"></span></div><input id="arrMultiple" type="range" min="1" max="12" value="3" step=".25" oninput="renderAll()" /></div><input type="number" id="arrMultipleNum" step=".25" onchange="syncRange('arrMultiple', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>Profit Multiple</strong><span id="profitMultipleLabel"></span></div><input id="profitMultiple" type="range" min="1" max="20" value="6" step=".5" oninput="renderAll()" /></div><input type="number" id="profitMultipleNum" step=".5" onchange="syncRange('profitMultiple', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>ARR Weight</strong><span id="arrWeightLabel"></span></div><input id="arrWeight" type="range" min="0" max="100" value="60" step="5" oninput="renderAll()" /></div><input type="number" id="arrWeightNum" step="5" onchange="syncRange('arrWeight', this.value)" /></div>
+          <div class="slider-row"><div><div class="slider-label"><strong>Corporate Tax (on profit)</strong><span id="taxRateLabel"></span></div><input id="taxRate" type="range" min="0" max="40" value="25" step="1" oninput="renderAll()" /></div><input type="number" id="taxRateNum" step="1" onchange="syncRange('taxRate', this.value)" /></div>
           <div class="formula-box" style="margin-top:14px;">
             <strong>Balanced valuation formula:</strong><br>
-            Valuation = (ARR × ARR Multiple × ARR Weight) + (Annual Profit × Profit Multiple × Profit Weight).<br>
-            Loss-making products are valued mainly on ARR, but profit risk is clearly visible.
+            Valuation = (ARR × ARR Multiple × ARR Weight) + (<strong>Post-tax</strong> Annual Profit × Profit Multiple × Profit Weight).<br>
+            Profit is taxed at the corporate rate above (default 25%) before it is capitalised. Loss-making products are valued mainly on ARR.
           </div>
         </div>
         <div class="card chart-card">
@@ -530,6 +531,11 @@
           </div>
           <div id="emiOutput" class="formula-box" style="margin-top:16px;"></div>
         </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-title"><div><h2>Investor Return by Exit Year</h2><p>Indicative value of the investor's stake if the company were sold at the end of each year, at the current raise terms. <strong>Informational only</strong> — equity returns are realised solely on a future sale of the stake; this is not a buyback commitment and not a periodic payout.</p></div></div>
+        <div class="table-wrap"><table id="returnByYearTable"></table></div>
       </div>
 
       <div class="card" style="margin-top:18px;">
@@ -682,6 +688,7 @@ function getScenario() {
     arrMultiple: val('arrMultiple'),
     profitMultiple: val('profitMultiple'),
     arrWeight: val('arrWeight') / 100,
+    taxRate: val('taxRate') / 100,
   };
 }
 
@@ -710,7 +717,9 @@ function calcProduct(p, sc = getScenario(), mode = 'target') {
   const arr = revenue * 12;
   const annualProfit = profit * 12;
   const profitWeight = 1 - sc.arrWeight;
-  const valuation = Math.max(0, arr * sc.arrMultiple * sc.arrWeight + Math.max(0, annualProfit) * sc.profitMultiple * profitWeight);
+  const taxRate = Math.min(0.95, Math.max(0, sc.taxRate ?? 0.25));
+  const postTaxAnnualProfit = annualProfit > 0 ? annualProfit * (1 - taxRate) : annualProfit;
+  const valuation = Math.max(0, arr * sc.arrMultiple * sc.arrWeight + Math.max(0, postTaxAnnualProfit) * sc.profitMultiple * profitWeight);
   const risk = profit >= 0 ? 'Profit' : 'Loss Risk';
 
   // Unit economics (per-product churn, gross margin excludes loss reserve)
@@ -923,7 +932,7 @@ function renderScenario(rows) {
   renderScenarioCompare();
 }
 
-const CONTROL_IDS = ['priceChange','subChange','devChange','mktChange','fixedChange','lossReserve','growthRate','churnRate','annualPriceIncrease','costInflation','arrMultiple','profitMultiple','arrWeight'];
+const CONTROL_IDS = ['priceChange','subChange','devChange','mktChange','fixedChange','lossReserve','growthRate','churnRate','annualPriceIncrease','costInflation','arrMultiple','profitMultiple','arrWeight','taxRate'];
 
 function getSavedScenarios() {
   try { return JSON.parse(localStorage.getItem('rexoScenarios') || '[]'); } catch (e) { return []; }
@@ -982,6 +991,7 @@ function computeScenarioTotals(s) {
     devChange: s.controls.devChange, mktChange: s.controls.mktChange,
     fixedChange: s.controls.fixedChange/100, lossReserve: s.controls.lossReserve,
     arrMultiple: s.controls.arrMultiple, profitMultiple: s.controls.profitMultiple, arrWeight: s.controls.arrWeight/100,
+    taxRate: (s.controls.taxRate ?? 25) / 100,
   };
   const rows = (s.products || products).map(p => calcProduct(p, sc));
   return totals(rows);
@@ -1189,12 +1199,27 @@ function renderInvestment(rows) {
     return `<tr${hi?' style="background:#FFF7E2;"':''}><td><strong>${ratio(mu)}</strong></td><td>${money(ev)}</td><td>${money(stake)}</td><td class="${mo>=1?'positive':'negative'}">${ratio(mo)}</td><td class="${ir>=0?'positive':'negative'}">${pct(ir)}</td></tr>`;
   }).join('');
   document.getElementById('returnTable').innerHTML = `<thead><tr><th>Exit ARR Multiple</th><th>Exit Valuation</th><th>Investor Stake Value</th><th>MOIC</th><th>IRR p.a.</th></tr></thead><tbody>${tBody}</tbody>`;
+
+  // Investor return by exit year (informational — value if sold at each year-end)
+  const maxYear = Math.floor(proj.length / 12);
+  const yrList = [3, 4, 5].filter(y => y <= maxYear);
+  const yrBody = yrList.map(y => {
+    const pm = proj.slice(0, y*12).slice(-1)[0];
+    const arrY = pm ? pm.revenue * 12 : 0;
+    const evY = arrY * exitMult;
+    const stakeY = evY * equity;
+    const moY = amount > 0 ? stakeY / amount : 0;
+    const irY = moY > 0 ? (Math.pow(moY, 1/y) - 1) * 100 : -100;
+    const hi = y === Math.round(years);
+    return `<tr${hi ? ' style="background:#FFF7E2;"' : ''}><td><strong>Year ${y}</strong> · ${calMonth(y*12)}</td><td>${money(arrY)}</td><td>${money(evY)}</td><td><strong>${money(stakeY)}</strong></td><td class="${moY>=1?'positive':'negative'}">${ratio(moY)}</td><td class="${irY>=0?'positive':'negative'}">${pct(irY)}</td></tr>`;
+  }).join('');
+  document.getElementById('returnByYearTable').innerHTML = `<thead><tr><th>Exit Year</th><th>Projected ARR</th><th>Exit Valuation (×${ratio(exitMult)})</th><th>Investor Stake Value (${pct(equity*100)})</th><th>MOIC</th><th>IRR p.a.</th></tr></thead><tbody>${yrBody}</tbody>`;
 }
 
 /* ---------------- Labels & orchestration ---------------- */
 function updateLabels() {
   const mappings = [
-    ['priceChange', 'priceChangeLabel', 'priceChangeNum', '%'], ['subChange', 'subChangeLabel', 'subChangeNum', '%'], ['devChange', 'devChangeLabel', 'devChangeNum', ' pts'], ['mktChange', 'mktChangeLabel', 'mktChangeNum', ' pts'], ['fixedChange', 'fixedChangeLabel', 'fixedChangeNum', '%'], ['lossReserve', 'reserveLabel', 'lossReserveNum', '%'], ['growthRate', 'growthLabel', 'growthRateNum', '%'], ['churnRate', 'churnLabel', 'churnRateNum', '%'], ['annualPriceIncrease', 'annualPriceLabel', 'annualPriceIncreaseNum', '%'], ['costInflation', 'costInflationLabel', 'costInflationNum', '%'], ['arrMultiple', 'arrMultipleLabel', 'arrMultipleNum', 'x'], ['profitMultiple', 'profitMultipleLabel', 'profitMultipleNum', 'x'], ['arrWeight', 'arrWeightLabel', 'arrWeightNum', '%']
+    ['priceChange', 'priceChangeLabel', 'priceChangeNum', '%'], ['subChange', 'subChangeLabel', 'subChangeNum', '%'], ['devChange', 'devChangeLabel', 'devChangeNum', ' pts'], ['mktChange', 'mktChangeLabel', 'mktChangeNum', ' pts'], ['fixedChange', 'fixedChangeLabel', 'fixedChangeNum', '%'], ['lossReserve', 'reserveLabel', 'lossReserveNum', '%'], ['growthRate', 'growthLabel', 'growthRateNum', '%'], ['churnRate', 'churnLabel', 'churnRateNum', '%'], ['annualPriceIncrease', 'annualPriceLabel', 'annualPriceIncreaseNum', '%'], ['costInflation', 'costInflationLabel', 'costInflationNum', '%'], ['arrMultiple', 'arrMultipleLabel', 'arrMultipleNum', 'x'], ['profitMultiple', 'profitMultipleLabel', 'profitMultipleNum', 'x'], ['arrWeight', 'arrWeightLabel', 'arrWeightNum', '%'], ['taxRate', 'taxRateLabel', 'taxRateNum', '%']
   ];
   mappings.forEach(([id, label, numId, suffix]) => {
     const el = document.getElementById(id);
