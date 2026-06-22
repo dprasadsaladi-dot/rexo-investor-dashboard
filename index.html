@@ -930,6 +930,20 @@ function getSavedScenarios() {
 }
 function setSavedScenarios(list) { localStorage.setItem('rexoScenarios', JSON.stringify(list)); }
 
+// Ship starter scenarios so a fresh visitor sees Base vs Conservative side-by-side.
+// Only seeds when the browser has none saved — never overwrites a user's own scenarios.
+function seedDefaultScenarios() {
+  if (getSavedScenarios().length) return;
+  const base = {};
+  CONTROL_IDS.forEach(id => base[id] = val(id));            // current shipped defaults (conservative)
+  const conservative = { ...base };                          // 3x ARR / 6x profit
+  const baseCase = { ...base, arrMultiple: 4, profitMultiple: 8 }; // optimistic multiples
+  setSavedScenarios([
+    { name: 'Base Case', controls: baseCase, products: structuredClone(sampleProducts) },
+    { name: 'Conservative', controls: conservative, products: structuredClone(sampleProducts) },
+  ]);
+}
+
 function saveNamedScenario() {
   const nameEl = document.getElementById('scenarioName');
   const name = (nameEl.value || '').trim();
@@ -1587,6 +1601,7 @@ function initTooltips() {
 window.addEventListener('resize', () => setTimeout(renderAll, 120));
 window.addEventListener('click', e => { if (e.target.id === 'breakModal') closeBreakEven(); });
 initTooltips();
+seedDefaultScenarios();
 renderAll();
 </script>
 </body>
