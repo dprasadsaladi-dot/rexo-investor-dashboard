@@ -486,8 +486,8 @@
       <div class="grid two">
         <div class="card">
           <div class="section-title"><div><h2>Valuation Assumptions</h2><p>Use conservative investor-ready multiples. Adjust for traction, retention, market size and product moat.</p></div></div>
-          <div class="slider-row"><div><div class="slider-label"><strong>ARR Revenue Multiple</strong><span id="arrMultipleLabel"></span></div><input id="arrMultiple" type="range" min="1" max="12" value="4" step=".25" oninput="renderAll()" /></div><input type="number" id="arrMultipleNum" step=".25" onchange="syncRange('arrMultiple', this.value)" /></div>
-          <div class="slider-row"><div><div class="slider-label"><strong>Profit Multiple</strong><span id="profitMultipleLabel"></span></div><input id="profitMultiple" type="range" min="1" max="20" value="8" step=".5" oninput="renderAll()" /></div><input type="number" id="profitMultipleNum" step=".5" onchange="syncRange('profitMultiple', this.value)" /></div>
+          <div class="slider-row"><div><div class="slider-label"><strong>ARR Revenue Multiple</strong><span id="arrMultipleLabel"></span></div><input id="arrMultiple" type="range" min="1" max="12" value="3" step=".25" oninput="renderAll()" /></div><input type="number" id="arrMultipleNum" step=".25" onchange="syncRange('arrMultiple', this.value)" /></div>
+          <div class="slider-row"><div><div class="slider-label"><strong>Profit Multiple</strong><span id="profitMultipleLabel"></span></div><input id="profitMultiple" type="range" min="1" max="20" value="6" step=".5" oninput="renderAll()" /></div><input type="number" id="profitMultipleNum" step=".5" onchange="syncRange('profitMultiple', this.value)" /></div>
           <div class="slider-row"><div><div class="slider-label"><strong>ARR Weight</strong><span id="arrWeightLabel"></span></div><input id="arrWeight" type="range" min="0" max="100" value="60" step="5" oninput="renderAll()" /></div><input type="number" id="arrWeightNum" step="5" onchange="syncRange('arrWeight', this.value)" /></div>
           <div class="formula-box" style="margin-top:14px;">
             <strong>Balanced valuation formula:</strong><br>
@@ -516,7 +516,7 @@
             <div class="scenario-box"><label>Investment Amount (₹)</label><input id="investAmount" type="number" value="15000000" step="500000" oninput="renderAll()" /></div>
             <div class="scenario-box"><label>Equity Offered (%)</label><input id="investEquity" type="number" value="20" step="0.5" min="0.1" max="100" oninput="renderAll()" /></div>
             <div class="scenario-box"><label>Exit Horizon (years)</label><input id="exitYears" type="number" value="3" step="1" min="1" max="3" oninput="renderAll()" /></div>
-            <div class="scenario-box"><label>Exit Valuation Multiple (× ARR)</label><input id="exitMultiple" type="number" value="6" step="0.5" min="1" oninput="renderAll()" /></div>
+            <div class="scenario-box"><label>Exit Valuation Multiple (× ARR)</label><input id="exitMultiple" type="number" value="5" step="0.5" min="1" oninput="renderAll()" /></div>
           </div>
           <div id="investOutput" class="formula-box" style="margin-top:16px;"></div>
         </div>
