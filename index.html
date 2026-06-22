@@ -1158,6 +1158,14 @@ function renderInvestment(rows) {
   const moic = amount > 0 ? investorStakeExit / amount : 0;
   const irr = moic > 0 ? (Math.pow(moic, 1/years) - 1) * 100 : -100;
 
+  // Downside protection — value the company under the Stress (Downside) assumptions, then
+  // apply a standard 1x liquidation preference (investor gets the greater of capital back or pro-rata).
+  const stressSc = { ...getScenario(), subChange: -0.30, devChange: 3, mktChange: 3, fixedChange: 0.20, lossReserve: 8, arrMultiple: 2.5, profitMultiple: 5 };
+  const stressVal = totals(calcAll(stressSc)).valuation;
+  const stressProRata = stressVal * equity;
+  const protectedAmt = Math.min(amount, stressVal);      // 1x pref: capital returned first, capped at what the sale yields
+  const covered = stressVal >= amount;
+
   document.getElementById('investOutput').innerHTML = `
     <strong>Implied valuation from this offer</strong><br>
     Post-money: <strong>${money(postMoney)}</strong> &nbsp;|&nbsp; Pre-money: <strong>${money(preMoney)}</strong> (for ${pct(equity*100)} equity).<br>
@@ -1168,7 +1176,10 @@ function renderInvestment(rows) {
     Projected exit ARR: <strong>${money(exitArr)}</strong> × ${ratio(exitMult)} = exit valuation <strong>${money(exitValuation)}</strong>.<br>
     Investor stake value at exit: <strong>${money(investorStakeExit)}</strong> →
     <strong class="${moic>=1?'positive':'negative'}">MOIC ${ratio(moic)}</strong>,
-    approx <strong class="${irr>=0?'positive':'negative'}">IRR ${pct(irr)}</strong> p.a.`;
+    approx <strong class="${irr>=0?'positive':'negative'}">IRR ${pct(irr)}</strong> p.a.<br><br>
+    <strong>Downside protection (1× liquidation preference)</strong><br>
+    On any exit the investor receives the <em>greater of</em> their ${money(amount)} back or their ${pct(equity*100)} share — keeping full upside in good cases while protecting capital on the downside. Capital is safe on any sale above ${money(amount)}.<br>
+    Even the model's <strong>Stress (Downside)</strong> company value of <strong>${money(stressVal)}</strong> (≈ ${ratio(stressVal/Math.max(1,amount))} the raise) ${covered ? `clears that — the full <strong class="positive">${money(protectedAmt)}</strong> is returned first` : `is below the raise — the preference returns <strong class="negative">${money(protectedAmt)}</strong>`}, vs a pro-rata ${money(stressProRata)} without the preference.`;
 
   // EMI
   const P = val('loanAmount');
