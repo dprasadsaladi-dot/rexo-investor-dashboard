@@ -15,3 +15,6 @@ Rexo_Model.json
 
 # Internal-only investor Q&A (contains candid red-flags — never publish to the public repo)
 INVESTOR_QA_INTERNAL.html
+
+# Personal plain-English numbers guide (keep local; not for the public repo)
+REXO_NUMBERS_GUIDE.html
