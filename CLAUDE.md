@@ -38,7 +38,9 @@ RexoBooks · RexoPayroll · RexoCompliance OS · PracticeDesk · RexoGST · Site
 - **Everything is derived.** Changing a product's inputs (e.g. `subs`) auto-recomputes
   revenue, profit, ARR, margin, LTV/CAC, valuation, 36-month projection, break-even,
   peak funding need, and investor returns. Usually you only edit `sampleProducts`.
-- **"Target Subscribers" KPI = sum of all products' `subs`.** (Currently 1000.)
+- **"Target Subscribers" KPI = sum of all products' `subs`.** (Currently 3000 — the
+  mature 2029 target from the 3-year plan: Books 1000, Payroll 1000, PracticeDesk 500,
+  GST 200, Compliance 200, Siteledge 100.)
 - **Current ⇄ Target toggle** flips KPIs/charts/tables between today's paid-pilot
   reality and the target plan.
 - **localStorage caching:** the app persists edits to `localStorage`

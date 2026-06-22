@@ -605,12 +605,12 @@
 //  betaCompanies = current paying pilots, pilotFee = current monthly fee per pilot (discounted)
 //  subs = TARGET paying subscribers at launch + 12 months, launchMonth = months from now (Jun 2026)
 const sampleProducts = [
-  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 190, recurring: 86, dev: 22, mkt: 18, fixed: 120000, churn: 2.0, cac: 2500, status: 'Beta', betaCompanies: 2, pilotFee: 749, launchMonth: 6 },
-  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 230, recurring: 88, dev: 18, mkt: 18, fixed: 80000, churn: 2.5, cac: 1800, status: 'Beta', betaCompanies: 1, pilotFee: 499, launchMonth: 6 },
-  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 90, recurring: 82, dev: 20, mkt: 20, fixed: 95000, churn: 2.0, cac: 4000, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
-  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 270, recurring: 84, dev: 16, mkt: 18, fixed: 60000, churn: 3.0, cac: 1200, status: 'Beta', betaCompanies: 1, pilotFee: 399, launchMonth: 6 },
-  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 160, recurring: 85, dev: 22, mkt: 18, fixed: 100000, churn: 2.5, cac: 2200, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
-  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 60, recurring: 80, dev: 25, mkt: 20, fixed: 160000, churn: 1.5, cac: 12000, status: 'Beta', betaCompanies: 1, pilotFee: 2499, launchMonth: 6 }
+  { name: 'RexoBooks', desc: 'Complete finance solution for accounting, MIS and finance operations.', fee: 1499, subs: 1000, recurring: 86, dev: 22, mkt: 18, fixed: 120000, churn: 2.0, cac: 2500, status: 'Beta', betaCompanies: 10, pilotFee: 833, launchMonth: 6 },
+  { name: 'RexoPayroll', desc: 'Payroll solution for consultants, MSMEs and monthly payroll compliance.', fee: 999, subs: 1000, recurring: 88, dev: 18, mkt: 18, fixed: 80000, churn: 2.5, cac: 1800, status: 'Beta', betaCompanies: 5, pilotFee: 0, launchMonth: 6 },
+  { name: 'RexoCompliance OS', desc: 'Statutory operating pack for CS, CA and compliance teams.', fee: 1999, subs: 200, recurring: 82, dev: 20, mkt: 20, fixed: 95000, churn: 2.0, cac: 4000, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
+  { name: 'PracticeDesk', desc: 'Client folder, document and practice management workspace.', fee: 799, subs: 500, recurring: 84, dev: 16, mkt: 18, fixed: 60000, churn: 3.0, cac: 1200, status: 'Beta', betaCompanies: 1, pilotFee: 0, launchMonth: 6 },
+  { name: 'RexoGST', desc: 'GST filing, JSON preparation, reconciliation and compliance application.', fee: 1299, subs: 200, recurring: 85, dev: 22, mkt: 18, fixed: 100000, churn: 2.5, cac: 2200, status: 'Development', betaCompanies: 0, pilotFee: 0, launchMonth: 12 },
+  { name: 'Siteledge', desc: 'End-to-end construction site and project management operating system.', fee: 4999, subs: 100, recurring: 80, dev: 25, mkt: 20, fixed: 160000, churn: 1.5, cac: 12000, status: 'Beta', betaCompanies: 1, pilotFee: 4167, launchMonth: 6 }
 ];
 
 const NUMERIC_KEYS = ['fee','subs','recurring','dev','mkt','fixed','churn','cac','betaCompanies','pilotFee','launchMonth'];
